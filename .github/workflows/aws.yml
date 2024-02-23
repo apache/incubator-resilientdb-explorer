@@ -43,5 +43,5 @@ jobs:
             pm2 delete viteapp || true
             cd ~/explorer
             npm install -g http-server
-            pm2 start http-server --name "viteapp" -- -p 8080 ./
+            pm2 start http-server --name "viteapp" -- -p 8080 ./dist
             pm2 save
