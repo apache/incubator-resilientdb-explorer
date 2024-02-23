@@ -1,12 +1,10 @@
 <template>
-	<div class="">
 		<apexcharts
 			height="300"
 			type="line"
 			:options="chartOptions"
 			:series="series"
 		></apexcharts>
-	</div>
 	<button @click="updateChart">Update</button>
 </template>
 

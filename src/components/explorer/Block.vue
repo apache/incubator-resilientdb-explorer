@@ -82,6 +82,12 @@
 							</a>
 						</a-tag>
 				</a-descriptions-item>
+
+				<a-descriptions-item label="CMD">
+					{{ data[0].transactions[0].cmd }}
+				</a-descriptions-item>
+				
+
 				<a-descriptions-item label="Created At">
 					{{ data[0].createdAt }}
 				</a-descriptions-item>

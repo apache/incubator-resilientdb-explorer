@@ -52,6 +52,11 @@
 			},
 		},
 		{
+			title: "CMD",
+			dataIndex: "cmd",
+			key: "cmd",
+		},
+		{
 			title: "Transactions",
 			dataIndex: "transactions",
 			key: "transactions",
@@ -120,6 +125,8 @@
 					return blockIdMatch || transactionMatch;
 				});
 			});
+
+			console.log(blocks);
 
 			// Define the onSearch function
 			const onSearch = (value) => {
@@ -190,6 +197,9 @@
 							bytes
 						</span>
 					</template>
+					<template v-if="column.key === 'cmd'">
+						<span class="cmd">{{ record.transactions[0]?.cmd }}</span>
+					</template>
 					<template v-if="column.key === 'transactions'">
 						<a-tag color="cyan">
 							<a :href="'/transactions?id=' + record.id">
@@ -203,6 +213,7 @@
 						</div>
 					</template>
 				</template>
+				
 				<template #title><span>Latest Blocks</span></template>
 
 				<template
@@ -324,5 +335,16 @@
 	.search {
 		margin-top: 3rem;
 		margin: 0.5rem 2rem;
+	}
+	.cmd{
+	background: #D3D3D3;
+	display: inline-block;
+    margin: 0 -8px;
+    padding: 0 8px;
+	border: 1px solid gray;
+	border-radius: 10px;
+	width: 120px;
+	font-size: 12px;
+	text-align:center;
 	}
 </style>
