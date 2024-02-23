@@ -1,4 +1,4 @@
-# nexres_dashboard
+# ResilientDB Explorer
 ## Customize configuration
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
