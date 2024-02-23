@@ -7,6 +7,12 @@
 		SearchOutlined,
 	} from "@ant-design/icons-vue";
 	import { defineComponent, reactive, ref, toRefs, computed } from "vue";
+	import { library } from '@fortawesome/fontawesome-svg-core';
+	import { faSearch } from '@fortawesome/free-solid-svg-icons';
+	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+	library.add(faSearch);
+
 	const columns = [
 		{
 			title: "Block # (sort)",
@@ -86,6 +92,7 @@
 			DownOutlined,
 			FireTwoTone,
 			SearchOutlined,
+			'font-awesome-icon': FontAwesomeIcon,
 		},
 		setup() {
 			const state = reactive({
@@ -170,17 +177,23 @@
 
 <template>
 	<div class="container timeline">
-		<div class="search">
+		<div class="searchParent">
+			<div class="search">
+			<font-awesome-icon class="fa-icon" icon="search" />
 			<a-input-search
 				v-model:value="searchText"
 				placeholder="Search by Block ID / Txn Hash "
 				enter-button
 				@search="onSearch"
-			/>
+			>
+			</a-input-search>
+			
 		</div>
 
+		</div>
+		
 		<div class="grid letOverflow">
-			<a-table :columns="columns" :data-source="data" bordered>
+			<a-table class="text-steel-dark" :columns="columns" :data-source="data">
 				<!-- <template #headerCell="{ column }">
 					<template v-if="column.key === 'name'">
 						<span>
@@ -214,7 +227,9 @@
 					</template>
 				</template>
 				
-				<template #title><span>Latest Blocks</span></template>
+				<template #title>
+					<span class="latestBlocks">Latest Blocks</span>
+				</template>
 
 				<template
 					#filterDropdown="{
@@ -291,6 +306,17 @@
 	</div>
 </template>
 <style scoped>
+	.latestBlocks{
+		font-size: 18px;
+    	line-height: 1.13;
+		font-weight: 600;
+		color: rgb(17,17,17,0.65);
+		margin-left: -1rem;
+		display: inline-block; /* This is needed to position the pseudo-elements */
+		position: relative;
+		
+	}
+
 	.container {
 		width: 100%;
 		align-self: center;
@@ -332,19 +358,103 @@
 		background-color: rgb(255, 192, 105);
 		padding: 0px;
 	}
+
+	.searchParent{
+		margin: 0 1rem;
+    	padding: 0 1rem;
+	}
 	.search {
+		display: flex; /* Aligns children inline */
+		align-items: center; /* Centers children vertically */
 		margin-top: 3rem;
-		margin: 0.5rem 2rem;
+		border-radius: 0.25rem;
+	}
+
+	.search:hover{
+		background-color: #15527b0d;
+		outline: none;
+		box-shadow: none;
+		border: none;
 	}
 	.cmd{
-	background: #D3D3D3;
-	display: inline-block;
-    margin: 0 -8px;
-    padding: 0 8px;
-	border: 1px solid gray;
-	border-radius: 10px;
-	width: 120px;
-	font-size: 12px;
-	text-align:center;
+		background: #D3D3D3;
+		display: inline-block;
+		margin: 0 -8px;
+		padding: 0 8px;
+		border: 1px solid gray;
+		border-radius: 10px;
+		width: 120px;
+		font-size: 12px;
+		text-align:center;
 	}
+
+	::v-deep .ant-table {
+		border-collapse: separate;
+		border-spacing: 0;
+	}
+
+	::v-deep .ant-table-thead > tr > th{
+		border-top: 1px solid black;
+	}
+	::v-deep .ant-table-tbody > tr > td {
+		border: none; /* Remove all borders from cells */
+	}
+	::v-deep .ant-table-thead > tr > th {
+		background-color: #f0f0f0; /* Example: Light grey background */
+		color: #333; /* Dark text color */
+		font-weight: bold;
+		height: 1.875rem;
+		text-align: left;
+		font-size: 12px;
+		line-height: 1.13;
+		font-weight: 600;
+		text-transform: uppercase;
+		color: rgb(117,143,158,1);
+	}
+
+	::v-deep .ant-input {
+		outline: none;
+		outline-offset: 2px;
+		border-width: 1px;
+		background: none;
+		border:none;
+		font-family: Red Hat Mono Variable,Red Hat Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+		font-size: 12px;
+		box-shadow: none;
+	}
+
+	::v-deep .ant-input:hover{
+		outline: none;
+		box-shadow: none;
+		border: none;
+		background: none;
+	}
+
+	/* Style for the input within the wrapper */
+	::v-deep .ant-input-search > .ant-input-affix-wrapper > .ant-input {
+		border: none !important; /* Remove border inside the wrapper if present */
+		box-shadow: none !important; /* Remove inner shadow if present */
+	}
+
+	/* Optionally, style the placeholder text */
+		::v-deep .ant-input::placeholder {
+		color: grey !important; /* Change the placeholder text color */
+	}
+
+	/* Hide the search button if it is styled as a primary button */
+	::v-deep .ant-input-search-button {
+		display: none !important;
+	}
+
+	/* Style the search icon */
+	.fa-icon {
+		 /* Adjust the spacing to the right of the icon */
+		color: #ccc; /* Adjust the color as needed */
+		padding-top: 0.86rem;
+		padding-bottom: 0.88rem;
+		padding-left: 20px;
+		flex-shrink: 0; /* Prevents the icon from shrinking */
+}
+	
+
 </style>
