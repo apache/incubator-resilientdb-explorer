@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           source: "dist/*"
-          target: "/explorer"
+          target: "~/explorer"
           
       - name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -41,7 +41,7 @@ jobs:
           port: 22
           script: |
             pm2 delete viteapp || true
-            cd /explorer
+            cd ~/explorer
             npm install -g http-server
             pm2 start http-server --name "viteapp" -- -p 8080 ./
             pm2 save
