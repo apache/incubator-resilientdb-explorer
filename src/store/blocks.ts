@@ -43,24 +43,59 @@ interface LedgerState {
 }
 
 export const useBlocksStore = defineStore("blocks", {
-	state: () => {
-		const state: BlocksState = {
-			blocks: [],
-		};
-		return state;
+	state: () => ({
+	  blocks: [],
+	  searchText: "", // Add searchText to the state
+	}),
+  
+	getters: {
+	  filteredBlocks: (state) => {
+		const result = state.blocks.filter((block) => {
+		  const blockIdMatch = block.id.toString().includes(state.searchText);
+		  const transactionMatch = block.transactions.some((tx) => 
+			tx && tx.key && tx.key.includes(state.searchText)
+		  );
+		  return blockIdMatch || transactionMatch;
+		}).map((block) => ({
+		  ...block,
+		  relativeCreatedAt: relativeTime(block.createdAt),
+		}));
+		return result;
+	  },
 	},
-
+  
 	actions: {
-		async refreshBlocks() {
-			const endpointsStore = useEndpointsStore();
-			if (!endpointsStore.endpoints[0]) {
-				throw new Error("No Endpoints Found.");
-			}
-
-			this.blocks = await getAvailableBlocks(endpointsStore.endpoints[0]);
-		},
+	  async refreshBlocks() {
+		const endpointsStore = useEndpointsStore();
+		if (!endpointsStore.endpoints[0]) {
+		  throw new Error("No Endpoints Found.");
+		}
+  
+		this.blocks = await getAvailableBlocks(endpointsStore.endpoints[0]);
+	  },
+	  setSearchText(newSearchText) {
+		this.searchText = newSearchText;
+	  },
 	},
-});
+  });
+  
+  function relativeTime(createdAt) {
+	const now = new Date();
+	const createdAtDate = new Date(createdAt);
+	const diffInSeconds = Math.floor((now - createdAtDate) / 1000);
+	const days = Math.floor(diffInSeconds / 86400);
+	const hours = Math.floor((diffInSeconds % 86400) / 3600);
+	const minutes = Math.floor((diffInSeconds % 3600) / 60);
+	const seconds = diffInSeconds % 60;
+  
+	let timeString = "";
+	if (days > 0) timeString += `${days}d `;
+	if (hours > 0) timeString += `${hours}h `;
+	if (minutes > 0) timeString += `${minutes}m `;
+	if (seconds > 0) timeString += `${seconds}s`;
+  
+	return timeString.trim();
+  }
 
 export const useLedgerStore = defineStore("ledger", {
 	state: () => {

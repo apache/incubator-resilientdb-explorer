@@ -1,13 +1,11 @@
 <template>
-	<div class="">
 		<apexcharts
 			height="300"
 			type="line"
 			:options="chartOptions"
 			:series="series"
 		></apexcharts>
-	</div>
-	<button @click="updateChart">Update</button>
+	<!-- <button @click="updateChart">Update</button> -->
 </template>
 
 <script>
@@ -88,8 +86,12 @@
 				chartOptions: {
 					chart: {
 						id: "basic-line",
+						type: 'area', // Change the chart type to area
 						toolbar: {
-							show: false,
+						show: false,
+						},
+						zoom: {
+						enabled: false, // Disabling zoom if not required
 						},
 					},
 					xaxis: {
@@ -99,22 +101,62 @@
 						min: 0,
 					},
 					grid: {
-						show: false,
-					},
-
-					colors: ["#59b4a9"],
-
-					fill: {
-						color: "#59b4a9",
-						type: "gradient",
-					},
-					title: {
-						text: "Resilient Transaction History",
-						style: {
-							fontFamily: "Poppins, 'Helvetica Neue', sans-serif",
-							fontWeight: "normal",
+						show: true,
+						borderColor: '#f1f1f1',
+						strokeDashArray: 5, // To create dotted lines, set a dash array
+						position: 'back', // Position grid lines to the back of the area fill
+						xaxis: {
+						lines: {
+							show: true // Show vertical grid lines beneath the data points
+						}
+						},
+						yaxis: {
+						lines: {
+							show: true // Show horizontal grid lines beneath the data points
+						}
+						},
+						padding: {
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0
 						},
 					},
+					stroke: {
+						curve: 'smooth'
+					},
+					colors: ["#59b4a9"], // Line color
+					fill: {
+						type: "gradient", // Define the fill type as gradient
+						gradient: {
+						shadeIntensity: 1,
+						opacityFrom: 0.7,
+						opacityTo: 0.0,
+						stops: [0, 90, 100],
+						colorStops: [
+							{
+							offset: 0,
+							color: "#59b4a9",
+							opacity: 1
+							},
+							{
+							offset: 90,
+							color: "#59b4a9",
+							opacity: 0.4
+							},
+							{
+							offset: 100,
+							color: "#59b4a9",
+							opacity: 0.2
+							},
+						]
+						}
+					},
+				markers: {
+					size: 0 // Hide markers
+				},
+				// Add additional options as needed
+					colors: ["#59b4a9"],
 				},
 				series: [
 					{

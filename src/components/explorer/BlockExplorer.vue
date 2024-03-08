@@ -19,14 +19,6 @@
 		width: 100%;
 		align-self: center;
 		margin: auto;
-	}
-	.heading {
-		display: flex;
-		width: 100%;
-		margin: 0 2rem;
-	}
-	.search {
-		margin-top: 3rem;
-		margin: 0.5rem 2rem;
+		background: linear-gradient(176deg, #D2EBFA 51.68%, #D5F7EE 100%); /* Background gradient */
 	}
 </style>
