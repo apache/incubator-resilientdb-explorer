@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import DashboardView from "../views/DashboardView.vue";
-import HomeView from "../views/Home/HomeView.vue";
 import BlockExplorer from "../components/explorer/BlockExplorer.vue";
 import Block from "../components/explorer/Block.vue";
 import Transactions from "../components/explorer/Transactions.vue";

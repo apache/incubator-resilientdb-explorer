@@ -42,6 +42,11 @@ interface LedgerState {
 	ledger: Ledger[];
 }
 
+interface State {
+	blocks: Block[];
+	searchText: string;
+}
+
 export const useBlocksStore = defineStore("blocks", {
 	state: () => ({
 	  blocks: [],
@@ -49,7 +54,7 @@ export const useBlocksStore = defineStore("blocks", {
 	}),
   
 	getters: {
-	  filteredBlocks: (state) => {
+	  filteredBlocks: (state: State) => {
 		const result = state.blocks.filter((block) => {
 		  const blockIdMatch = block.id.toString().includes(state.searchText);
 		  const transactionMatch = block.transactions.some((tx) => 
@@ -73,16 +78,16 @@ export const useBlocksStore = defineStore("blocks", {
   
 		this.blocks = await getAvailableBlocks(endpointsStore.endpoints[0]);
 	  },
-	  setSearchText(newSearchText) {
+	  setSearchText(newSearchText: string) {
 		this.searchText = newSearchText;
 	  },
 	},
   });
   
-  function relativeTime(createdAt) {
-	const now = new Date();
+  function relativeTime(createdAt: string): string {
+	const now = Date.now(); // Current time in milliseconds
 	const createdAtDate = new Date(createdAt);
-	const diffInSeconds = Math.floor((now - createdAtDate) / 1000);
+	const diffInSeconds = Math.floor((now - createdAtDate.getTime()) / 1000);
 	const days = Math.floor(diffInSeconds / 86400);
 	const hours = Math.floor((diffInSeconds % 86400) / 3600);
 	const minutes = Math.floor((diffInSeconds % 3600) / 60);
