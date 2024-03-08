@@ -8,84 +8,12 @@
 	} from "@ant-design/icons-vue";
 	import { defineComponent, reactive, ref, toRefs, computed } from "vue";
 	import { library } from '@fortawesome/fontawesome-svg-core';
-	import { faSearch } from '@fortawesome/free-solid-svg-icons';
+	import { faCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 	library.add(faSearch);
+	library.add(faCircle);
 
-	const columns = [
-		{
-			title: "Block # (sort)",
-			dataIndex: "id",
-			key: "id",
-			fixed: "left",
-			width: 120,
-			sorter: {
-				compare: (a, b) => a.id - b.id,
-				multiple: 1,
-			},
-			defaultSortOrder: 'descend',
-		},
-		{
-			title: " Block # (search)",
-			dataIndex: "number",
-			key: "number",
-			width: 120,
-			fixed: "left",
-			slots: {
-				filterDropdown: "filterDropdown",
-				filterIcon: "filterIcon",
-				customRender: "customRender",
-			},
-			onFilter: (value, record) =>
-				record.number.toString().toLowerCase().includes(value.toLowerCase()),
-			onFilterDropdownVisibleChange: (visible) => {
-				if (visible) {
-					setTimeout(() => {
-						console.log(searchInput.value);
-						searchInput.value.focus();
-					}, 100);
-				}
-			},
-		},
-		{
-			title: "Size",
-			dataIndex: "size",
-			key: "size",
-			sorter: {
-				compare: (a, b) => a.size - b.size,
-				multiple: 1,
-			},
-		},
-		{
-			title: "CMD",
-			dataIndex: "cmd",
-			key: "cmd",
-		},
-		{
-			title: "Transactions",
-			dataIndex: "transactions",
-			key: "transactions",
-		},
-		{
-			title: "Created At",
-			key: "createdAt",
-			dataIndex: "createdAt",
-			fixed: "right",
-			width: 130,
-		},
-	];
-
-	// const transactions = [];
-	// for (var i = 0; i < data.length; i++) {
-	// 	var obj = data[i].transactions;
-	// 	for (var key in obj) {
-	// 		var val = obj[key];
-	// 		transactions.push(val);
-	// 	}
-	// }
-
-	// console.log(transactions[0].txnHash);
 
 	export default defineComponent({
 		components: {
@@ -118,22 +46,47 @@
 			// Reactive state for search text
 			const searchText = ref("");
 
-			// Reactive state for filtered blocks
-			const filteredBlocks = computed(() => {
-				return blocks.value.filter((block) => {
-					// Check if block ID matches the search text
-					const blockIdMatch = block.id.toString().includes(searchText.value);
-					
-					// Check if any transaction matches the search text (if cmd is "SET")
-					const transactionMatch = block.transactions.some((tx) => {
-						return tx && tx.key && tx.key.includes(searchText.value);
-					});
+			// Define the relativeTime function here
+			const relativeTime = (createdAt) => {
+			const now = new Date();
+			const createdAtDate = new Date(createdAt);
+			const diffInSeconds = Math.floor((now.getTime() - createdAtDate.getTime()) / 1000);
+			const days = Math.floor(diffInSeconds / (3600 * 24));
+			const hours = Math.floor((diffInSeconds % (3600 * 24)) / 3600);
+			const minutes = Math.floor((diffInSeconds % 3600) / 60);
+			const seconds = Math.floor(diffInSeconds % 60);
 
-					return blockIdMatch || transactionMatch;
+			let components = []; // Use an array to keep time components
+
+			if (days > 0) components.push(`${days}d`);
+			if (hours > 0 || days > 0) components.push(`${hours}h`); // Include hours if there are any days
+			if (minutes > 0 && components.length < 2) components.push(`${minutes}m`); // Include minutes if less than 2 components are added
+			if (seconds > 0 && components.length < 2) components.push(`${seconds}s`); // Include seconds if less than 2 components are added
+
+			// Join the first two components or return the single component
+			return components.slice(0, 2).join(" ");
+		};
+
+			// Reactive state for filtered blocks with relativeCreatedAt included
+			const filteredBlocks = computed(() => {
+			return blocks.value.filter((block) => {
+				// Check if block ID matches the search text
+				const blockIdMatch = block.id.toString().includes(searchText.value);
+				
+				// Check if any transaction matches the search text (if cmd is "SET")
+				const transactionMatch = block.transactions.some((tx) => {
+				return tx && tx.key && tx.key.includes(searchText.value);
 				});
+
+				return blockIdMatch || transactionMatch;
+			}).map(block => ({
+				...block,
+				relativeCreatedAt: relativeTime(block.createdAt), // Add relativeCreatedAt property
+			}));
 			});
 
 			console.log(blocks);
+			
 
 			// Define the onSearch function
 			const onSearch = (value) => {
@@ -161,6 +114,58 @@
 				console.log('Websocket for reading blocks has been closed'); 
 			});
 
+			const columns = [
+				{
+					title: " Block # (search)",
+					dataIndex: "number",
+					key: "number",
+					width: 150,
+					fixed: "left",
+					sorter: {
+						compare: (a, b) => a.id - b.id,
+						multiple: 1,
+					},
+					defaultSortOrder: 'descend',
+					slots: {
+						filterDropdown: "filterDropdown",
+						filterIcon: "filterIcon",
+						customRender: "customRender",
+					},
+					onFilter: (value, record) =>
+						record.number.toString().toLowerCase().includes(value.toLowerCase()),
+					onFilterDropdownVisibleChange: (visible) => {
+						if (visible) {
+							setTimeout(() => {
+								console.log(searchInput.value);
+								searchInput.value.focus();
+							}, 100);
+						}
+					},
+				},
+				{
+					title: "Size",
+					dataIndex: "size",
+					key: "size",
+					width: 150,
+					sorter: {
+						compare: (a, b) => a.size - b.size,
+						multiple: 1,
+					},
+				},
+				{
+					title: "CMD",
+					dataIndex: "cmd",
+					width: 150,
+					key: "cmd",
+				},
+				{
+					title: "created At",
+					dataIndex: "relativeCreatedAt",
+					width: 150,
+					key: "createdAt",
+				},
+			];
+
 			return {
 				searchText,
 				data: filteredBlocks,
@@ -179,7 +184,7 @@
 	<div class="container timeline">
 		<div class="searchParent">
 			<div class="search">
-			<font-awesome-icon class="fa-icon" icon="search" />
+				<font-awesome-icon class="fa-icon" icon="search" />
 			<a-input-search
 				v-model:value="searchText"
 				placeholder="Search by Block ID / Txn Hash "
@@ -213,12 +218,8 @@
 					<template v-if="column.key === 'cmd'">
 						<span class="cmd">{{ record.transactions[0]?.cmd }}</span>
 					</template>
-					<template v-if="column.key === 'transactions'">
-						<a-tag color="cyan">
-							<a :href="'/transactions?id=' + record.id">
-								View transaction
-							</a>
-						</a-tag>
+					<template v-if="column.key === 'createdAt'">
+						<span>{{ record.relativeCreatedAt }}</span>
 					</template>
 					<template v-else-if="column.key === 'gasUsed'">
 						<div>
@@ -231,51 +232,11 @@
 					<span class="latestBlocks">Latest Blocks</span>
 				</template>
 
-				<template
-					#filterDropdown="{
-						setSelectedKeys,
-						selectedKeys,
-						confirm,
-						clearFilters,
-						column,
-					}"
-				>
-					<div style="padding: 8px">
-						<a-input
-							ref="searchInput"
-							:placeholder="`Search ${column.dataIndex}`"
-							:value="selectedKeys[0]"
-							style="width: 188px; margin-bottom: 8px; display: block"
-							@change="
-								(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])
-							"
-							@pressEnter="
-								handleSearch(selectedKeys, confirm, column.dataIndex)
-							"
-						/>
-						<a-button
-							type="primary"
-							size="small"
-							style="width: 90px; margin-right: 8px"
-							@click="handleSearch(selectedKeys, confirm, column.dataIndex)"
-						>
-							<template #icon><SearchOutlined /></template>
-							Search
-						</a-button>
-						<a-button
-							size="small"
-							style="width: 90px"
-							@click="handleReset(clearFilters)"
-						>
-							Reset
-						</a-button>
-					</div>
-				</template>
+				<!--Search functionality within a block for Block #-->
+				
 				<template #filterIcon="filtered">
-					<search-outlined
-						:style="{ color: filtered ? '#108ee9' : undefined }"
-					/>
 				</template>
+
 				<template #customRender="{ text, record, column }">
 					<span v-if="searchText && searchedColumn === column.dataIndex">
 						<template
@@ -295,12 +256,17 @@
 							>
 						</template>
 					</span>
+					
 					<template v-else>
-						<a :href="'/block?id=' + record.id">
-							{{ record.number }}
+						<a class="block-num" :href="'/block?id=' + record.id">
+							<span>
+								<font-awesome-icon class="fa-circle" icon="circle" />
+								{{ record.number }}
+							</span>
 						</a>
 					</template>
 				</template>
+				
 			</a-table>
 		</div>
 	</div>
@@ -314,7 +280,6 @@
 		margin-left: -1rem;
 		display: inline-block; /* This is needed to position the pseudo-elements */
 		position: relative;
-		
 	}
 
 	.container {
@@ -330,10 +295,6 @@
 	.grid {
 		margin: 0 1rem;
 		padding: 0 1rem;
-	}
-
-	.blockDisplay {
-		margin: 0 auto;
 	}
 
 	.letOverflow {
@@ -359,6 +320,14 @@
 		padding: 0px;
 	}
 
+	.block-num{
+		color: rgb(0 113 149);
+		font-weight: 600;
+		font-size: 14px;
+    	line-height: 1.13;
+		font-family: Red Hat Mono Variable, Red Hat Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+	}
+
 	.searchParent{
 		margin: 0 1rem;
     	padding: 0 1rem;
@@ -377,29 +346,31 @@
 		border: none;
 	}
 	.cmd{
-		background: #D3D3D3;
-		display: inline-block;
-		margin: 0 -8px;
-		padding: 0 8px;
-		border: 1px solid gray;
-		border-radius: 10px;
-		width: 120px;
+		outline: none;
+		outline-offset: 2px;
+		border-width: 1px;
+		background: none;
+		border:none;
+		font-family: Red Hat Mono Variable,Red Hat Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
 		font-size: 12px;
-		text-align:center;
+		box-shadow: none;
+	}
+
+	.fa-circle{
+		color: rgb(45 215 167);
+		font-size: 8px;
 	}
 
 	::v-deep .ant-table {
 		border-collapse: separate;
 		border-spacing: 0;
 	}
-
-	::v-deep .ant-table-thead > tr > th{
-		border-top: 1px solid black;
-	}
 	::v-deep .ant-table-tbody > tr > td {
 		border: none; /* Remove all borders from cells */
+		height: 10px;
 	}
 	::v-deep .ant-table-thead > tr > th {
+		border-top: 1px solid black;
 		background-color: #f0f0f0; /* Example: Light grey background */
 		color: #333; /* Dark text color */
 		font-weight: bold;
@@ -455,6 +426,5 @@
 		padding-left: 20px;
 		flex-shrink: 0; /* Prevents the icon from shrinking */
 }
-	
 
 </style>
