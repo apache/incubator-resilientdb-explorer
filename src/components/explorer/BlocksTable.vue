@@ -6,7 +6,7 @@
 		FireTwoTone,
 		SearchOutlined,
 	} from "@ant-design/icons-vue";
-	import { defineComponent, reactive, ref, toRefs, computed } from "vue";
+	import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";
 	import { library } from '@fortawesome/fontawesome-svg-core';
 	import { faCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -46,55 +46,21 @@
 			// Reactive state for search text
 			const searchText = ref("");
 
-			// Define the relativeTime function here
-			const relativeTime = (createdAt) => {
-			const now = new Date();
-			const createdAtDate = new Date(createdAt);
-			const diffInSeconds = Math.floor((now.getTime() - createdAtDate.getTime()) / 1000);
-			const days = Math.floor(diffInSeconds / (3600 * 24));
-			const hours = Math.floor((diffInSeconds % (3600 * 24)) / 3600);
-			const minutes = Math.floor((diffInSeconds % 3600) / 60);
-			const seconds = Math.floor(diffInSeconds % 60);
-
-			let components = []; // Use an array to keep time components
-
-			if (days > 0) components.push(`${days}d`);
-			if (hours > 0 || days > 0) components.push(`${hours}h`); // Include hours if there are any days
-			if (minutes > 0 && components.length < 2) components.push(`${minutes}m`); // Include minutes if less than 2 components are added
-			if (seconds > 0 && components.length < 2) components.push(`${seconds}s`); // Include seconds if less than 2 components are added
-
-			// Join the first two components or return the single component
-			return components.slice(0, 2).join(" ");
-		};
+			
 
 			// Reactive state for filtered blocks with relativeCreatedAt included
-			const filteredBlocks = computed(() => {
-			return blocks.value.filter((block) => {
-				// Check if block ID matches the search text
-				const blockIdMatch = block.id.toString().includes(searchText.value);
-				
-				// Check if any transaction matches the search text (if cmd is "SET")
-				const transactionMatch = block.transactions.some((tx) => {
-				return tx && tx.key && tx.key.includes(searchText.value);
-				});
+			const filteredBlocks =  computed(() => blocksStore.filteredBlocks);
 
-				return blockIdMatch || transactionMatch;
-			}).map(block => ({
-				...block,
-				relativeCreatedAt: relativeTime(block.createdAt), // Add relativeCreatedAt property
-			}));
-			});
-
-			console.log(blocks);
-			
 
 			// Define the onSearch function
 			const onSearch = (value) => {
 				searchText.value = value;
 			};
 
-			const { refreshBlocks } = blocksStore;
-			refreshBlocks(); // Populate table on initial load
+			onMounted(async () => {
+				await blocksStore.refreshBlocks();
+				await nextTick(); // Ensures DOM is updated after state changes
+			});
 
 			const socket = new WebSocket('wss://crow.resilientdb.com/blockupdatelistener'); 
 			socket.addEventListener('open', function (event) { 
@@ -181,22 +147,8 @@
 </script>
 
 <template>
+<div class="white-background-wrapper">
 	<div class="container timeline">
-		<div class="searchParent">
-			<div class="search">
-				<font-awesome-icon class="fa-icon" icon="search" />
-			<a-input-search
-				v-model:value="searchText"
-				placeholder="Search by Block ID / Txn Hash "
-				enter-button
-				@search="onSearch"
-			>
-			</a-input-search>
-			
-		</div>
-
-		</div>
-		
 		<div class="grid letOverflow">
 			<a-table class="text-steel-dark" :columns="columns" :data-source="data">
 				<!-- <template #headerCell="{ column }">
@@ -226,10 +178,6 @@
 							<fire-two-tone two-tone-color="red" /> {{ record.gasUsed }}
 						</div>
 					</template>
-				</template>
-				
-				<template #title>
-					<span class="latestBlocks">Latest Blocks</span>
 				</template>
 
 				<!--Search functionality within a block for Block #-->
@@ -270,8 +218,18 @@
 			</a-table>
 		</div>
 	</div>
+</div>
 </template>
 <style scoped>
+	.white-background-wrapper {
+		background-color: #FFFFFF; /* Set background color to white */
+		width: 100%; /* Cover the full width */
+		display: flex; /* Use flex layout */
+		flex-direction: column; /* Stack children vertically */
+		align-items: center; /* Center children horizontally */
+		justify-content: flex-start; /* Align content to the start */
+	}
+
 	.latestBlocks{
 		font-size: 18px;
     	line-height: 1.13;
@@ -328,23 +286,6 @@
 		font-family: Red Hat Mono Variable, Red Hat Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
 	}
 
-	.searchParent{
-		margin: 0 1rem;
-    	padding: 0 1rem;
-	}
-	.search {
-		display: flex; /* Aligns children inline */
-		align-items: center; /* Centers children vertically */
-		margin-top: 3rem;
-		border-radius: 0.25rem;
-	}
-
-	.search:hover{
-		background-color: #15527b0d;
-		outline: none;
-		box-shadow: none;
-		border: none;
-	}
 	.cmd{
 		outline: none;
 		outline-offset: 2px;
@@ -383,48 +324,33 @@
 		color: rgb(117,143,158,1);
 	}
 
-	::v-deep .ant-input {
-		outline: none;
-		outline-offset: 2px;
-		border-width: 1px;
-		background: none;
-		border:none;
-		font-family: Red Hat Mono Variable,Red Hat Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
-		font-size: 12px;
-		box-shadow: none;
+	::v-deep .ant-table-tbody > tr > td {
+    background: #FFFFFF; /* White background for table cells */
 	}
 
-	::v-deep .ant-input:hover{
-		outline: none;
-		box-shadow: none;
-		border: none;
-		background: none;
+	/* Set the background color for the entire row on hover */
+	::v-deep .ant-table-tbody > tr:hover > td {
+		background: #F3F6F8; /* Light grey background for table rows on hover */
 	}
 
-	/* Style for the input within the wrapper */
-	::v-deep .ant-input-search > .ant-input-affix-wrapper > .ant-input {
-		border: none !important; /* Remove border inside the wrapper if present */
-		box-shadow: none !important; /* Remove inner shadow if present */
+	/* Set the background color for a specific table cell on hover */
+	::v-deep .ant-table-tbody > tr > td:hover {
+		background: #E1F3FF; /* Light blue background for table cells on hover */
 	}
 
-	/* Optionally, style the placeholder text */
-		::v-deep .ant-input::placeholder {
-		color: grey !important; /* Change the placeholder text color */
+	/* Ensure the hover background color change is visible only within the cell, 
+	not affecting the entire row. This might require specific handling based on 
+	the structure of your table and cells. The following is an additional rule 
+	to ensure row hover doesn't override cell hover. */
+	::v-deep .ant-table-tbody > tr:hover > td:hover {
+		background: #E1F3FF; /* This ensures the cell hover color is correct */
 	}
 
-	/* Hide the search button if it is styled as a primary button */
-	::v-deep .ant-input-search-button {
-		display: none !important;
+	/* Set the background color for table headings to white */
+	::v-deep .ant-table-thead > tr > th {
+		background: #FFFFFF; /* White background for table headings */
+		border: none !important; /* Remove borders */
+		outline: none !important; /* Remove outlines */
 	}
-
-	/* Style the search icon */
-	.fa-icon {
-		 /* Adjust the spacing to the right of the icon */
-		color: #ccc; /* Adjust the color as needed */
-		padding-top: 0.86rem;
-		padding-bottom: 0.88rem;
-		padding-left: 20px;
-		flex-shrink: 0; /* Prevents the icon from shrinking */
-}
 
 </style>
