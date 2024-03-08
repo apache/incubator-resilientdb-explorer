@@ -82,7 +82,7 @@
 
 			const columns = [
 				{
-					title: " Block # (search)",
+					title: " Block #",
 					dataIndex: "number",
 					key: "number",
 					width: 150,
