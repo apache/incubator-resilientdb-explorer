@@ -3,11 +3,22 @@
 	import { defineComponent } from "vue";
 	import Chart from "../explorer/Chart.vue";
 	import { useBlocksStore, useLedgerStore } from "@/store/blocks";
+	import { library } from '@fortawesome/fontawesome-svg-core';
+	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+	import { faDatabase, faLink , faLayerGroup, faHourglass} from '@fortawesome/free-solid-svg-icons';
 	import { storeToRefs } from "pinia";
+
+	library.add(faDatabase);
+	library.add(faLink);
+	library.add(faLayerGroup);
+	library.add(faHourglass);
 	
 	export default defineComponent({
 		name: "MetaData",
-		components: { Chart },
+		components: { 
+			Chart,
+			'font-awesome-icon': FontAwesomeIcon,
+		},
 		props: {
 			value: {
 				type: Int8Array,
@@ -84,19 +95,25 @@
 <template>
 	<div class="grid-container">
 	  <div class="card">
-		<a-card title="ResilientDB Data" class="custom-card">
+		<a-card class="custom-card">
+			<template v-slot:title>
+				<font-awesome-icon icon="database" class="fa-icon-custom"/> ResilientDB Data
+			</template>
 			<div class="statistics-grid">
-			<a-statistic title="Active Replicas" :value="data[0].replicaNum" />
-			<a-statistic title="Workers" :value="data[0].workerNum" />
-			<a-statistic title="Input Workers" :value="data[0].inputWorkerNum" />
-			<a-statistic title="Output Workers" :value="data[0].outputWorkerNum" />
-			<a-statistic title="Max Malicious Replicas" :value="data[0].maxMaliciousReplicaNum" />
-			<a-statistic title="Minimum Data Received" :value="data[0].minDataReceiveNum" />
+				<a-statistic title="Active Replicas" :value="data[0].replicaNum" />
+				<a-statistic title="Workers" :value="data[0].workerNum" />
+				<a-statistic title="Input Workers" :value="data[0].inputWorkerNum" />
+				<a-statistic title="Output Workers" :value="data[0].outputWorkerNum" />
+				<a-statistic title="Max Malicious Replicas" :value="data[0].maxMaliciousReplicaNum" />
+				<a-statistic title="Minimum Data Received" :value="data[0].minDataReceiveNum" />
 			</div>
 		</a-card>
 	  </div>
 	  <div class="card">
-		<a-card title="Chain Information" class="custom-card">
+		<a-card class="custom-card">
+			<template v-slot:title>
+				<font-awesome-icon icon="link" class="fa-icon-custom"/> Chain Information
+			</template>
 			<div class="stats-row">
 			<a-statistic title="Blocks" :value="data[0].blockNum" />
 			<a-statistic title="Transactions Committed" :value="data[0].transactionNum" />
@@ -110,7 +127,10 @@
 		</a-card>
 	  </div>
 	  <div class="card">
-		<a-card title="Other Data" class="custom-card">
+		<a-card class="custom-card">
+			<template v-slot:title>
+				<font-awesome-icon icon="layer-group" class="fa-icon-custom"/> Other data
+			</template>
 			<div class="statistics-grid">
 				<a-statistic title="Client Batch Size" :value="data[0].clientBatchNum" />
 				<a-statistic title="Client Batch Wait Time (MS)" :value="data[0].clientBatchWaitTime" />
@@ -121,7 +141,10 @@
 		</a-card>
 	  </div>
 	  <div class="card">
-		<a-card title="Resilient Transaction History" class="custom-card">
+		<a-card class="custom-card">
+			<template v-slot:title>
+				<font-awesome-icon icon="hourglass" class="fa-icon-custom"/> Resilient Transaction History
+			</template>
 		  <Chart :blocks="blocks"/>
 		</a-card>
 	  </div>
@@ -225,9 +248,8 @@
 }
 
 .chain-age-label {
-  position: absolute;
+  position: relative;
   left: 0;
-  bottom: -25px; /* Adjust as needed */
   font-size: 0.8em; /* Smaller font size */
   color: #566873; /* Font color */
 }
@@ -235,7 +257,7 @@
 .progress-bar {
   --progress-bar-width: 0; /* Default width to 0 */
   height: 10px;
-  background-color: #D5F7EE; /* Background for the incomplete part */
+  background-color: #BEE3F8; /* Background for the incomplete part */
   border-radius: 10px;
   position: relative;
   overflow: hidden;
@@ -248,7 +270,7 @@
   left: 0;
   width: var(--progress-bar-width); /* Use CSS variable for width */
   height: 100%;
-  background-color: #2DD7A7; /* Background for the completed part */
+  background-color: #4299E1; /* Background for the completed part */
   border-radius: 10px;
 }
 
@@ -291,6 +313,11 @@
 .a-divider {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.fa-icon-custom {
+	color: #BEE3F8;
+  	margin-right: 8px
 }
 
 </style>

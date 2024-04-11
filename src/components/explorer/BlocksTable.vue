@@ -82,7 +82,7 @@
 
 			const columns = [
 				{
-					title: " Block #",
+					title: " Block # (search)",
 					dataIndex: "number",
 					key: "number",
 					width: 150,
@@ -279,7 +279,7 @@
 	}
 
 	.block-num{
-		color: rgb(0 113 149);
+		color: #4299E1;
 		font-weight: 600;
 		font-size: 14px;
     	line-height: 1.13;
@@ -298,7 +298,7 @@
 	}
 
 	.fa-circle{
-		color: rgb(45 215 167);
+		color: #90CDF4;
 		font-size: 8px;
 	}
 
@@ -321,7 +321,7 @@
 		line-height: 1.13;
 		font-weight: 600;
 		text-transform: uppercase;
-		color: rgb(117,143,158,1);
+		color: #2C5282;
 	}
 
 	::v-deep .ant-table-tbody > tr > td {
@@ -351,6 +351,41 @@
 		background: #FFFFFF; /* White background for table headings */
 		border: none !important; /* Remove borders */
 		outline: none !important; /* Remove outlines */
+	}
+
+	/* Changes the background color of the pagination buttons */
+	::v-deep .ant-pagination-item {
+	background-color: #FFFFFF;
+	}
+
+	::v-deep .ant-pagination-item-active{
+		border-color: #4299E1;
+	}
+
+	::v-deep .ant-pagination-item-active a  {
+		
+		color: #2C5282;
+		outline: #2C5282;
+		
+	}
+
+	::v-deep .ant-pagination-item a  {
+		color: #1890ff;
+		border-color: #1890ff;
+	}
+
+	::v-deep .ant-pagination-item:hover  {
+		color: #1890ff;
+		border-color: #1890ff;
+	}
+
+	::v-deep .ant-pagination-item a:hover  {
+		color: #1890ff;
+	}
+	/* Style changes for the previous and next buttons */
+	::v-deep .ant-pagination-prev .ant-pagination-item-link, .ant-pagination-next .ant-pagination-item-link {
+		color: #1890ff;
+	border-color: #91d5ff;
 	}
 
 </style>
