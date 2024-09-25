@@ -1,6 +1,5 @@
 <script>
-import { useBlocksStore } from "@/store/blocks";
-import { useThemeStore } from "@/store/blocks"; // Import theme store
+import { useBlocksStore, useThemeStore } from "@/store/blocks";
 import { storeToRefs } from "pinia";
 import { DownOutlined, FireTwoTone, SearchOutlined } from "@ant-design/icons-vue";
 import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";
@@ -431,9 +430,34 @@ export default defineComponent({
 	color: #ffffff !important;
 }
 
+/* Light Mode Styles for Pagination Previous and Next Links */
+.light ::v-deep .ant-pagination-prev .ant-pagination-item-link,
+.light ::v-deep .ant-pagination-next .ant-pagination-item-link {
+	background-color: #FFFFFF; /* Light mode background */
+	color: #1890ff; /* Light mode text color */
+	border-color: #91d5ff; /* Light mode border color */
+}
+
+.light ::v-deep .ant-pagination-prev .ant-pagination-item-link:hover,
+.light ::v-deep .ant-pagination-next .ant-pagination-item-link:hover {
+	background-color: #FFFFFF; /* Maintain light background on hover */
+	color: #1890ff; /* Light mode text color on hover */
+	border-color: #91d5ff; /* Light mode border color on hover */
+}
+
+/* Dark Mode Styles for Pagination Previous and Next Links */
 .dark ::v-deep .ant-pagination-prev .ant-pagination-item-link,
 .dark ::v-deep .ant-pagination-next .ant-pagination-item-link {
-	color: #ffffff !important;
-	border-color: #ffffff !important;
+	background-color: #022045 !important; /* Dark mode background */
+	color: #ffffff !important; /* Light text color */
+	border-color: #ffffff !important; /* Light border color */
 }
+
+.dark ::v-deep .ant-pagination-prev .ant-pagination-item-link:hover,
+.dark ::v-deep .ant-pagination-next .ant-pagination-item-link:hover {
+	background-color: #022045 !important; /* Maintain dark background on hover */
+	color: #ffffff !important; /* Light text color on hover */
+	border-color: #ffffff !important; /* Light border color on hover */
+}
+
 </style>
