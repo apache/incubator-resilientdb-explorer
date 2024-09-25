@@ -368,39 +368,72 @@ export default defineComponent({
 	outline: none !important;
 }
 
-::v-deep .ant-pagination-item {
+/* Light Theme Styles for Pagination */
+.light ::v-deep .ant-pagination-item {
 	background-color: #FFFFFF;
 }
 
-::v-deep .ant-pagination-item-active {
-	border-color: #4299E1;
+.light ::v-deep .ant-pagination-item-active {
+	border-color: #4299E1; /* Highlight border in light mode */
 }
 
-::v-deep .ant-pagination-item-active a {
+.light ::v-deep .ant-pagination-item-active a {
 	color: #2C5282;
 	outline: #2C5282;
 }
 
-::v-deep .ant-pagination-item a {
+.light ::v-deep .ant-pagination-item a {
 	color: #1890ff;
 	border-color: #1890ff;
 }
 
-::v-deep .ant-pagination-item:hover {
+.light ::v-deep .ant-pagination-item:hover {
 	color: #1890ff;
 	border-color: #1890ff;
 }
 
-::v-deep .ant-pagination-item a:hover {
+.light ::v-deep .ant-pagination-item a:hover {
 	color: #1890ff;
 }
 
-::v-deep .ant-pagination-prev .ant-pagination-item-link,
-::v-deep .ant-pagination-next .ant-pagination-item-link {
+.light ::v-deep .ant-pagination-prev .ant-pagination-item-link,
+.light ::v-deep .ant-pagination-next .ant-pagination-item-link {
 	color: #1890ff;
 	border-color: #91d5ff;
 }
+
+/* Dark Theme Styles for Pagination */
+.dark ::v-deep .ant-pagination-item {
+	background-color: #022045 !important; /* Dark mode background */
+	color: #ffffff !important; /* Light text */
+}
+
+.dark ::v-deep .ant-pagination-item-active {
+	border-color: #90cdf4 !important; /* Highlight border in dark mode */
+}
+
+.dark ::v-deep .ant-pagination-item-active a {
+	color: #ffffff !important; /* Light text */
+	outline: #ffffff !important;
+}
+
+.dark ::v-deep .ant-pagination-item a {
+	color: #ffffff !important;
+	border-color: #ffffff !important;
+}
+
+.dark ::v-deep .ant-pagination-item:hover {
+	color: #ffffff !important;
+	border-color: #90cdf4 !important; /* Highlight on hover in dark mode */
+}
+
+.dark ::v-deep .ant-pagination-item a:hover {
+	color: #ffffff !important;
+}
+
+.dark ::v-deep .ant-pagination-prev .ant-pagination-item-link,
+.dark ::v-deep .ant-pagination-next .ant-pagination-item-link {
+	color: #ffffff !important;
+	border-color: #ffffff !important;
+}
 </style>
-
-
-  
