@@ -160,33 +160,57 @@
 <style scoped>
 /* Light Theme Styles */
 .light .grid-container {
-  background-color: #ffffff !important; /* Light background */
-  color: #000000 !important; /* Dark text */
+  background-color: #ffffff; /* Light background */
+  color: #000000; /* Dark text */
 }
 
 .light .custom-card {
-  background-color: #ffffff !important; /* Light card background */
-  color: #566873 !important; /* Dark text specific to light theme */
+  background-color: #ffffff; /* Light card background */
+  color: #566873; /* Dark grey text specific to light theme */
+}
+
+.light ::v-deep .ant-card-head {
+  background-color: #ffffff;
+}
+
+.light .chain-age-label {
+  color: #566873; /* Dark grey text */
+}
+
+.light .fa-icon-custom {
+  color: #244a8c; /* Original icon color in light theme */
 }
 
 /* Dark Theme Styles */
 .dark .grid-container {
-  background-color: #2d2d2d !important; /* Dark background */
-  color: #ffffff !important; /* Light text */
+  background-color: #2d2d2d; /* Dark background */
+  color: #ffffff; /* Light text */
 }
 
 .dark .custom-card {
-  background-color: #3a3a3a !important; /* Dark card background */
-  color: #ffffff !important; /* Light text specific to dark theme */
+  background-color: #244a8c; /* Dark card background */
+  color: #ffffff; /* Light text specific to dark theme */
 }
 
-/* General styles */
+.dark ::v-deep .ant-card-head {
+  background-color: #244a8c;
+}
+
+.dark .chain-age-label {
+  color: #e0e0e0; /* Light grey text */
+}
+
+.dark .fa-icon-custom {
+  color: #90cdf4; /* Lighter blue icon color for dark theme */
+}
+
+/* General Styles */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem; /* Adjust the gap between cards */
+  gap: 1rem;
   padding: 30px;
-  align-items: stretch; /* Stretch to fill the container */
+  align-items: stretch;
 }
 
 .card {
@@ -196,39 +220,49 @@
 .custom-card {
   flex: 1;
   border-radius: 1rem; /* Rounded borders */
-  font-family: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  font-size: 18px; /* Font size */
-  height: 100%; /* Equal height */
-  color: inherit !important; /* Ensure text inherits the color based on the theme */
+  overflow: hidden; /* Ensure child elements respect border-radius */
+  font-family: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 18px;
+  height: 100%;
+  color: inherit;
+  background-color: inherit;
 }
 
-/* Responsive design */
+/* Apply border-radius to the card header */
+.custom-card ::v-deep .ant-card-head {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .grid-container {
-    grid-template-columns: 1fr; /* One column on smaller screens */
+    grid-template-columns: 1fr;
   }
 }
 
 .custom-card .statistics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Create three columns */
-  grid-gap: 1rem; /* Spacing between grid items */
-  align-items: center; /* Align items vertically */
-  justify-content: center; /* Center items horizontally */
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
   .custom-card .statistics-grid {
-    grid-template-columns: 1fr; /* One column on smaller screens */
+    grid-template-columns: 1fr;
   }
 }
 
 .chain-age-label {
   position: relative;
   left: 0;
-  bottom: -10px; /* Adjust as needed */
-  font-size: 0.8em; /* Smaller font size */
-  color: inherit !important; /* Inherit color based on theme */
+  bottom: -10px;
+  font-size: 0.8em;
+  color: inherit !important;
 }
 
 .stats-container {
@@ -243,17 +277,17 @@
 }
 
 .stats-row.full-width {
-  justify-content: space-between; /* Adjust if you want different alignment */
+  justify-content: space-between;
 }
 
 .stat-item {
   display: flex;
   justify-content: space-between;
-  flex-basis: 49%; /* Adjust the width of each stat item in the first row */
+  flex-basis: 49%;
 }
 
 .a-divider {
-  margin: 1rem 0; /* Adjust as needed */
+  margin: 1rem 0;
 }
 
 .progress-bar-container {
@@ -262,9 +296,9 @@
 }
 
 .progress-bar {
-  --progress-bar-width: 0; /* Default width to 0 */
+  --progress-bar-width: 0;
   height: 10px;
-  background-color: #BEE3F8; /* Background for the incomplete part */
+  background-color: #BEE3F8;
   border-radius: 10px;
   position: relative;
   overflow: hidden;
@@ -275,19 +309,20 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: var(--progress-bar-width); /* Use CSS variable for width */
+  width: var(--progress-bar-width);
   height: 100%;
-  background-color: #4299E1; /* Background for the completed part */
+  background-color: #4299E1;
   border-radius: 10px;
 }
 
 .shiny-effect {
-  width: 50px; /* Set a fixed width for the shine effect */
+  width: 50px;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0) 100%);
   position: absolute;
   top: 0;
-  left: -50px; /* Start from the left, offset by the width of the effect */
+  left: -50px;
   animation: moveShine 4s linear infinite;
 }
 
@@ -296,25 +331,25 @@
     left: -50px;
   }
   to {
-    left: calc(var(--progress-bar-width) - 50px); /* Move to the end of the completed width */
+    left: calc(var(--progress-bar-width) - 50px);
   }
 }
 
 .statistics-row {
   display: flex;
-  justify-content: space-between; /* Distributes space between items */
+  justify-content: space-between;
 }
 
 .flex-item {
-  flex: 1; /* Allows each item to expand equally */
-  padding-right: 1rem; /* Adds spacing between items */
+  flex: 1;
+  padding-right: 1rem;
 }
 
 .statistics-full-row {
-  width: 100%; /* Full width for single items */
+  width: 100%;
   display: flex;
-  justify-content: space-between; /* Aligns title and value on opposite ends */
-  padding: 0 1rem; /* Optional padding for alignment */
+  justify-content: space-between;
+  padding: 0 1rem;
 }
 
 .a-divider {
@@ -322,10 +357,50 @@
   margin-bottom: 1rem;
 }
 
-.fa-icon-custom {
-  color: #BEE3F8;
-  margin-right: 8px;
+/* Adjustments for Ant Design Components in Dark Theme */
+.dark ::v-deep .ant-statistic-title,
+.dark ::v-deep .ant-statistic-content,
+.dark ::v-deep .ant-statistic-value,
+.dark ::v-deep .ant-statistic {
+  color: #ffffff; /* Light text */
+}
+
+.dark ::v-deep .ant-card-head-title {
+  color: #ffffff !important; /* Light text for card headers */
+}
+
+.dark ::v-deep .ant-card-head {
+  background-color: #1F3B73 !important; /* Slightly darker header background */
+}
+
+/* Adjust Progress Bar for Dark Theme */
+.dark .progress-bar {
+  background-color: #1F3B73 !important; /* Darker background */
+}
+
+.dark .progress-bar::before {
+  background-color: #90cdf4 !important; /* Lighter blue fill */
+}
+
+.dark .shiny-effect {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Ensure All Text Inside Cards Is Light in Dark Mode */
+.dark .custom-card,
+.dark .stat-item,
+.dark .stats-row,
+.dark .statistics-grid a-statistic,
+.dark .statistics-grid a-statistic .ant-statistic-title {
+  color: #ffffff !important;
+}
+
+/* Adjust Chart Component Text in Dark Theme */
+.dark .chart-container {
+  color: #ffffff !important;
 }
 </style>
+
 
 
