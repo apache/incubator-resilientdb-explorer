@@ -47,6 +47,10 @@ interface State {
 	searchText: string;
 }
 
+interface ThemeValue {
+	value?: string;
+}
+
 export const useBlocksStore = defineStore("blocks", {
 	state: () => ({
 	  blocks: [],
@@ -125,3 +129,22 @@ export const useLedgerStore = defineStore("ledger", {
 
 export const initialize = function () {
 };
+
+export const useThemeStore = defineStore('theme', {
+	state: (): { theme: ThemeValue } => {
+		const theme: ThemeValue = {
+		  value: 'light',
+		};
+		return { theme };
+	  },
+	  getters: {
+		isDarkTheme(state): boolean {
+		  return state.theme.value === 'dark';
+		},
+	  },
+	  actions: {
+		toggleTheme() {
+		  this.theme.value = this.theme.value === 'light' ? 'dark' : 'light';
+		},
+	  },
+  });

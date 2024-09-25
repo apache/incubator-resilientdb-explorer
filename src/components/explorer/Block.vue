@@ -29,11 +29,7 @@
 			title: "commitSignatures",
 			key: "commitSignatures",
 			dataIndex: "commitSignatures",
-		},
-		// {
-		// 	title: "Action",
-		// 	key: "action",
-		// },
+		}
 	];
 
 	export default defineComponent({
@@ -121,7 +117,7 @@
 	</div>
 </template>
 
-<style scoped>
+<style>
 	.container {
 		width: 100%;
 		align-self: center;

@@ -1,34 +1,45 @@
 <script>
-	import BlocksTable from "../explorer/BlocksTable.vue";
-	import MetaData from "../explorer/MetaData.vue";
-	import Background from '@/assets/explorer_bg.svg';
+import { computed } from 'vue';
+import BlocksTable from "../explorer/BlocksTable.vue";
+import MetaData from "../explorer/MetaData.vue";
+import { useThemeStore } from "@/store/blocks";
+import Background from '@/assets/explorer_bg.svg';
+import Background_Dark from '@/assets/background-dark.svg';
 
-	export default {
-	name: "BlocksExplorer",
-	components: { BlocksTable, MetaData },
-	data() {
-		return {
-			backgroundStyle: {
-				backgroundImage: `url(${Background})`,
-				backgroundSize: 'cover', // Cover the entire container
-				backgroundPosition: 'center', // Center the background image
-				}
-			};
-		},
-	};
+export default {
+  name: "BlocksExplorer",
+  components: { BlocksTable, MetaData },
+  setup() {
+    const themeStore = useThemeStore();
+    const theme = computed(() => themeStore.theme.value);
+
+    const backgroundStyle = computed(() => {
+      const backgroundImage = theme.value === 'dark' ? Background_Dark : Background;
+      return {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      };
+    });
+
+    return {
+      backgroundStyle,
+    };
+  },
+};
 </script>
-<template>
-	<div class="container timeline" :style="backgroundStyle">
-		<meta-data />
 
-		<blocks-table />
-	</div>
+<template>
+  <div class="container timeline" :style="backgroundStyle">
+    <meta-data />
+    <blocks-table />
+  </div>
 </template>
+
 <style scoped>
-	.container {
-		width: 100%;
-		align-self: center;
-		margin: auto;
-		/*background: linear-gradient(176deg, #D2EBFA 51.68%, #D5F7EE 100%); /* Background gradient */
-	}
+.container {
+  width: 100%;
+  align-self: center;
+  margin: auto;
+}
 </style>

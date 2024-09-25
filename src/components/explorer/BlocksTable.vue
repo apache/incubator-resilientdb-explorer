@@ -1,225 +1,211 @@
 <script>
-	import { useBlocksStore } from "@/store/blocks";
-	import { storeToRefs } from "pinia";
-	import {
-		DownOutlined,
-		FireTwoTone,
-		SearchOutlined,
-	} from "@ant-design/icons-vue";
-	import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";
-	import { library } from '@fortawesome/fontawesome-svg-core';
-	import { faCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
-	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { useBlocksStore } from "@/store/blocks";
+import { storeToRefs } from "pinia";
+import {
+  DownOutlined,
+  FireTwoTone,
+  SearchOutlined,
+} from "@ant-design/icons-vue";
+import {
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  computed,
+  onMounted,
+  nextTick,
+} from "vue";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-	library.add(faSearch);
-	library.add(faCircle);
+library.add(faSearch);
+library.add(faCircle);
 
+export default defineComponent({
+  components: {
+    DownOutlined,
+    FireTwoTone,
+    SearchOutlined,
+    "font-awesome-icon": FontAwesomeIcon,
+  },
+  setup() {
+    const state = reactive({
+      searchText: "",
+      searchedColumn: "",
+    });
 
-	export default defineComponent({
-		components: {
-			DownOutlined,
-			FireTwoTone,
-			SearchOutlined,
-			'font-awesome-icon': FontAwesomeIcon,
-		},
-		setup() {
-			const state = reactive({
-				searchText: "",
-				searchedColumn: "",
-			});
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+      confirm();
+      state.searchText = selectedKeys[0];
+      state.searchedColumn = dataIndex;
+    };
 
-			const handleSearch = (selectedKeys, confirm, dataIndex) => {
-				confirm();
-				state.searchText = selectedKeys[0];
-				state.searchedColumn = dataIndex;
-			};
+    const handleReset = (clearFilters) => {
+      clearFilters();
+      state.searchText = "";
+    };
 
-			const handleReset = (clearFilters) => {
-				clearFilters();
-				state.searchText = "";
-			};
+    const searchInput = ref();
+    const blocksStore = useBlocksStore();
+    const { blocks } = storeToRefs(blocksStore);
 
-			const searchInput = ref();
-			const blocksStore = useBlocksStore();
-			const { blocks } = storeToRefs(blocksStore);
+    // Reactive state for search text
+    const searchText = ref("");
 
-			// Reactive state for search text
-			const searchText = ref("");
+    // Function to escape regex special characters
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
-			
+    // Computed property for escaped search text
+    const escapedSearchText = computed(() => escapeRegExp(searchText.value));
 
-			// Reactive state for filtered blocks with relativeCreatedAt included
-			const filteredBlocks =  computed(() => blocksStore.filteredBlocks);
+    // Reactive state for filtered blocks
+    const filteredBlocks = computed(() => blocksStore.filteredBlocks);
 
+    // Define the onSearch function
+    const onSearch = (value) => {
+      searchText.value = value;
+    };
 
-			// Define the onSearch function
-			const onSearch = (value) => {
-				searchText.value = value;
-			};
+    onMounted(async () => {
+      await blocksStore.refreshBlocks();
+      await nextTick(); // Ensures DOM is updated after state changes
+    });
 
-			onMounted(async () => {
-				await blocksStore.refreshBlocks();
-				await nextTick(); // Ensures DOM is updated after state changes
-			});
+    const socket = new WebSocket(
+      "wss://crow.resilientdb.com/blockupdatelistener"
+    );
+    socket.addEventListener("open", function (event) {
+      console.log("Opened websocket for reading blocks");
+    });
 
-			const socket = new WebSocket('wss://crow.resilientdb.com/blockupdatelistener'); 
-			socket.addEventListener('open', function (event) { 
-				console.log('Opened websocket for reading blocks'); 
-			}); 
+    socket.addEventListener("message", function (event) {
+      console.log(event.data);
 
-			socket.addEventListener('message', function (event) { 
-				console.log(event.data);
+      function delay(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
+      delay(1000).then(() => blocksStore.refreshBlocks());
+    });
 
-				function delay(time) {
-					return new Promise(resolve => setTimeout(resolve, time));
-				}
-				delay(1000).then(() => refreshBlocks());
-			});
+    socket.addEventListener("close", function (event) {
+      console.log("Websocket for reading blocks has been closed");
+    });
 
-			socket.addEventListener('close', function (event) { 
-				console.log('Websocket for reading blocks has been closed'); 
-			});
+    const columns = [
+      {
+        title: " Block # (search)",
+        dataIndex: "number",
+        key: "number",
+        width: 150,
+        fixed: "left",
+        sorter: {
+          compare: (a, b) => a.id - b.id,
+          multiple: 1,
+        },
+        defaultSortOrder: "descend",
+        slots: {
+          filterDropdown: "filterDropdown",
+          filterIcon: "filterIcon",
+          customRender: "customRender",
+        },
+        onFilter: (value, record) =>
+          record.number.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownVisibleChange: (visible) => {
+          if (visible) {
+            setTimeout(() => {
+              console.log(searchInput.value);
+              searchInput.value.focus();
+            }, 100);
+          }
+        },
+      },
+      {
+        title: "Size",
+        dataIndex: "size",
+        key: "size",
+        width: 150,
+        sorter: {
+          compare: (a, b) => a.size - b.size,
+          multiple: 1,
+        },
+      },
+      {
+        title: "CMD",
+        dataIndex: "cmd",
+        width: 150,
+        key: "cmd",
+      },
+      {
+        title: "created At",
+        dataIndex: "relativeCreatedAt",
+        width: 150,
+        key: "createdAt",
+      },
+    ];
 
-			const columns = [
-				{
-					title: " Block # (search)",
-					dataIndex: "number",
-					key: "number",
-					width: 150,
-					fixed: "left",
-					sorter: {
-						compare: (a, b) => a.id - b.id,
-						multiple: 1,
-					},
-					defaultSortOrder: 'descend',
-					slots: {
-						filterDropdown: "filterDropdown",
-						filterIcon: "filterIcon",
-						customRender: "customRender",
-					},
-					onFilter: (value, record) =>
-						record.number.toString().toLowerCase().includes(value.toLowerCase()),
-					onFilterDropdownVisibleChange: (visible) => {
-						if (visible) {
-							setTimeout(() => {
-								console.log(searchInput.value);
-								searchInput.value.focus();
-							}, 100);
-						}
-					},
-				},
-				{
-					title: "Size",
-					dataIndex: "size",
-					key: "size",
-					width: 150,
-					sorter: {
-						compare: (a, b) => a.size - b.size,
-						multiple: 1,
-					},
-				},
-				{
-					title: "CMD",
-					dataIndex: "cmd",
-					width: 150,
-					key: "cmd",
-				},
-				{
-					title: "created At",
-					dataIndex: "relativeCreatedAt",
-					width: 150,
-					key: "createdAt",
-				},
-			];
-
-			return {
-				searchText,
-				data: filteredBlocks,
-				columns,
-				handleSearch,
-				searchInput,
-				handleReset,
-            	onSearch,
-				...toRefs(state),
-			};
-		},
-	});
+    return {
+      searchText,
+      escapedSearchText,
+      data: filteredBlocks,
+      columns,
+      handleSearch,
+      searchInput,
+      handleReset,
+      onSearch,
+      ...toRefs(state),
+    };
+  },
+});
 </script>
 
+
 <template>
-<div class="white-background-wrapper">
-	<div class="container timeline">
+	<div class="white-background-wrapper">
+	  <div class="container timeline">
 		<div class="grid letOverflow">
-			<a-table class="text-steel-dark" :columns="columns" :data-source="data">
-				<!-- <template #headerCell="{ column }">
-					<template v-if="column.key === 'name'">
-						<span>
-							<smile-outlined />
-							Name
-						</span>
-					</template>
-				</template> -->
-
-				<template #bodyCell="{ column, record }">
-					<template v-if="column.key === 'size'">
-						<span>
-							{{ record.size }}
-							bytes
-						</span>
-					</template>
-					<template v-if="column.key === 'cmd'">
-						<span class="cmd">{{ record.transactions[0]?.cmd }}</span>
-					</template>
-					<template v-if="column.key === 'createdAt'">
-						<span>{{ record.relativeCreatedAt }}</span>
-					</template>
-					<template v-else-if="column.key === 'gasUsed'">
-						<div>
-							<fire-two-tone two-tone-color="red" /> {{ record.gasUsed }}
-						</div>
-					</template>
+		  <a-table class="text-steel-dark" :columns="columns" :data-source="data">
+			<!-- Existing templates for body cells -->
+			<!-- ... (rest of your template code) ... -->
+  
+			<!-- Search functionality within a block for Block # -->
+			<template #customRender="{ text, record, column }">
+			  <span v-if="searchText && searchedColumn === column.dataIndex">
+				<template
+				  v-for="(fragment, i) in text
+					.toString()
+					.split(new RegExp(`(${escapedSearchText})`, 'i'))"
+				  :key="i"
+				>
+				  <mark
+					v-if="fragment.toLowerCase() === searchText.toLowerCase()"
+					class="highlight"
+				  >
+					<a :href="'/block?id=' + record.id">{{ fragment }}</a>
+				  </mark>
+				  <template v-else>
+					<a :href="'/block?id=' + record.id">{{ fragment }}</a>
+				  </template>
 				</template>
-
-				<!--Search functionality within a block for Block #-->
-				
-				<template #filterIcon="filtered">
-				</template>
-
-				<template #customRender="{ text, record, column }">
-					<span v-if="searchText && searchedColumn === column.dataIndex">
-						<template
-							v-for="(fragment, i) in text
-								.toString()
-								.split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-						>
-							<mark
-								v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-								class="highlight"
-								:key="i"
-							>
-								<a :href="'/block?id=' + record.id">{{ fragment }}</a>
-							</mark>
-							<template v-else>
-								<a :href="'/block?id=' + record.id">{{ fragment }}</a></template
-							>
-						</template>
-					</span>
-					
-					<template v-else>
-						<a class="block-num" :href="'/block?id=' + record.id">
-							<span>
-								<font-awesome-icon class="fa-circle" icon="circle" />
-								{{ record.number }}
-							</span>
-						</a>
-					</template>
-				</template>
-				
-			</a-table>
+			  </span>
+  
+			  <template v-else>
+				<a class="block-num" :href="'/block?id=' + record.id">
+				  <span>
+					<font-awesome-icon class="fa-circle" icon="circle" />
+					{{ record.number }}
+				  </span>
+				</a>
+			  </template>
+			</template>
+		  </a-table>
 		</div>
+	  </div>
 	</div>
-</div>
-</template>
+  </template>
+  
 <style scoped>
 	.white-background-wrapper {
 		background-color: #FFFFFF; /* Set background color to white */

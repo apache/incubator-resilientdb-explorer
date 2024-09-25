@@ -14,6 +14,7 @@
 
 <style lang="scss">
 	@import "@/styles/variables.scss";
+	@import "@/styles/base.css";
 	#app {
 		width: 100%;
 		height: 100%;

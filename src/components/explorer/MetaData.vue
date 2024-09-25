@@ -1,8 +1,9 @@
 
 <script lang="ts">
-	import { defineComponent } from "vue";
+	import { defineComponent, computed } from "vue";
 	import Chart from "../explorer/Chart.vue";
 	import { useBlocksStore, useLedgerStore } from "@/store/blocks";
+	import { useThemeStore } from "@/store/blocks"; 
 	import { library } from '@fortawesome/fontawesome-svg-core';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 	import { faDatabase, faLink , faLayerGroup, faHourglass} from '@fortawesome/free-solid-svg-icons';
@@ -32,7 +33,7 @@
 		},
 		computed: {
 			progressBarWidth() {
-			const maxAge = 20000000;
+			const maxAge = 200000000;
 			const currentAge = this.data[0].chainAge;
 			const percentage = Math.min(currentAge / maxAge * 100, 100); // Ensure the percentage does not exceed 100
 			return `${percentage}%`;
@@ -77,6 +78,7 @@
 			const ledgerStore = useLedgerStore();
 			const { ledger } = storeToRefs(ledgerStore);
 			const { populateTable } = ledgerStore;
+			const themeStore = useThemeStore();
 			await populateTable();
 
 			const blocksStore = useBlocksStore();
@@ -84,18 +86,22 @@
 			const { refreshBlocks } = blocksStore;
 			await refreshBlocks();
 
+			// Access the theme store
+			const theme = computed(() => themeStore.theme.value);
+
 			return {
 				data: ledger,
 				blocks: blocks,
+				theme, // Return the theme for use in the template
 			};
 		}
 	});
 </script>
 
 <template>
-	<div class="grid-container">
-	  <div class="card">
-		<a-card class="custom-card">
+	<div :class="['grid-container', theme]">
+	  <div :class="['card', theme]">
+		<a-card :class="['custom-card', theme]">
 			<template v-slot:title>
 				<font-awesome-icon icon="database" class="fa-icon-custom"/> ResilientDB Data
 			</template>
@@ -109,8 +115,8 @@
 			</div>
 		</a-card>
 	  </div>
-	  <div class="card">
-		<a-card class="custom-card">
+	  <div :class="['card', theme]">
+		<a-card :class="['custom-card', theme]">
 			<template v-slot:title>
 				<font-awesome-icon icon="link" class="fa-icon-custom"/> Chain Information
 			</template>
@@ -126,8 +132,8 @@
 			</div>
 		</a-card>
 	  </div>
-	  <div class="card">
-		<a-card class="custom-card">
+	  <div :class="['card', theme]">
+		<a-card :class="['custom-card', theme]">
 			<template v-slot:title>
 				<font-awesome-icon icon="layer-group" class="fa-icon-custom"/> Other data
 			</template>
@@ -140,8 +146,8 @@
 			</div>
 		</a-card>
 	  </div>
-	  <div class="card">
-		<a-card class="custom-card">
+	  <div :class="['card', theme]">
+		<a-card :class="['custom-card', theme]">
 			<template v-slot:title>
 				<font-awesome-icon icon="hourglass" class="fa-icon-custom"/> Resilient Transaction History
 			</template>
@@ -151,13 +157,36 @@
 	</div>
 </template>
 
-
 <style scoped>
+/* Light Theme Styles */
+.light .grid-container {
+  background-color: #ffffff !important; /* Light background */
+  color: #000000 !important; /* Dark text */
+}
+
+.light .custom-card {
+  background-color: #ffffff !important; /* Light card background */
+  color: #566873 !important; /* Dark text specific to light theme */
+}
+
+/* Dark Theme Styles */
+.dark .grid-container {
+  background-color: #2d2d2d !important; /* Dark background */
+  color: #ffffff !important; /* Light text */
+}
+
+.dark .custom-card {
+  background-color: #3a3a3a !important; /* Dark card background */
+  color: #ffffff !important; /* Light text specific to dark theme */
+}
+
+/* General styles */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem; /* Adjust the gap between cards */
   padding: 30px;
+  align-items: stretch; /* Stretch to fill the container */
 }
 
 .card {
@@ -168,17 +197,12 @@
   flex: 1;
   border-radius: 1rem; /* Rounded borders */
   font-family: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  color: #566873; /* Font color */
   font-size: 18px; /* Font size */
   height: 100%; /* Equal height */
+  color: inherit !important; /* Ensure text inherits the color based on the theme */
 }
 
-/* Optional: If you want the cards to have the same height regardless of content */
-.grid-container {
-  align-items: stretch; /* Stretch to fill the container */
-}
-
-/* Media query for responsive design */
+/* Responsive design */
 @media (max-width: 768px) {
   .grid-container {
     grid-template-columns: 1fr; /* One column on smaller screens */
@@ -197,14 +221,14 @@
   .custom-card .statistics-grid {
     grid-template-columns: 1fr; /* One column on smaller screens */
   }
+}
 
-  .chain-age-label {
+.chain-age-label {
   position: relative;
   left: 0;
   bottom: -10px; /* Adjust as needed */
   font-size: 0.8em; /* Smaller font size */
-  color: #566873; /* Font color */
-}
+  color: inherit !important; /* Inherit color based on theme */
 }
 
 .stats-container {
@@ -232,26 +256,9 @@
   margin: 1rem 0; /* Adjust as needed */
 }
 
-/* Adjust span styles for proper alignment and display */
-.stats-row span:first-child {
-  flex: 1;
-}
-
-.stats-row span:last-child {
-  flex: 0;
-  text-align: right;
-}
-
 .progress-bar-container {
   position: relative;
   margin-top: 1rem;
-}
-
-.chain-age-label {
-  position: relative;
-  left: 0;
-  font-size: 0.8em; /* Smaller font size */
-  color: #566873; /* Font color */
 }
 
 .progress-bar {
@@ -316,8 +323,9 @@
 }
 
 .fa-icon-custom {
-	color: #BEE3F8;
-  	margin-right: 8px
+  color: #BEE3F8;
+  margin-right: 8px;
 }
-
 </style>
+
+
