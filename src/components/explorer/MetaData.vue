@@ -192,9 +192,7 @@
   color: #ffffff; /* Light text specific to dark theme */
 }
 
-.dark ::v-deep .ant-card-head {
-  background-color: #244a8c;
-}
+
 
 .dark .chain-age-label {
   color: #e0e0e0; /* Light grey text */
