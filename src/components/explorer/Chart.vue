@@ -10,7 +10,7 @@
   
   <script>
   import VueApexCharts from "vue3-apexcharts";
-  import { useThemeStore } from "@/store/blocks";
+  import { useThemeStore } from "@/store/theme";
   import { ref, watch, reactive, computed } from "vue";
   
   export default {

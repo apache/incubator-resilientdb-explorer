@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { useBlocksStore } from "@/store/blocks";
+	import { useThemeStore } from "@/store/theme"; 
 	import { storeToRefs } from "pinia";
 	import { DownOutlined, FireTwoTone } from "@ant-design/icons-vue";
-	import { defineComponent } from "vue";
+	import { defineComponent, computed } from "vue";
 	import { useRoute } from "vue-router";
 	const columns = [
 		{
@@ -41,6 +42,7 @@
 			const route = useRoute();
 			const blocksStore = useBlocksStore();
 			const { blocks } = storeToRefs(blocksStore);
+			const themeStore = useThemeStore();
 			const { refreshBlocks } = blocksStore;
 			await refreshBlocks();
 
@@ -67,9 +69,13 @@
             return result.trim();
         };
 
+		// Access the theme store
+		const theme = computed(() => themeStore.theme.value);
+
 		const relativeCreatedAt = (relativeTime(block[0]?.createdAt));
 
 			return {
+				theme,
 				data: block,
 				columns,
 				relativeCreatedAt,
@@ -81,8 +87,8 @@
 
 </script>
 <template>
-	<div class="container timeline">
-		<div class="grid letOverflow">
+	<div :class="['container timeline', theme]">
+		<div :class="['grid letOverflow', theme]">
 			<a-descriptions
 				title="Block Info"	
 				bordered

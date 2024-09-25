@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import BlocksTable from "../explorer/BlocksTable.vue";
 import MetaData from "../explorer/MetaData.vue";
-import { useThemeStore } from "@/store/blocks";
+import { useThemeStore } from "@/store/theme";
 import Background from '@/assets/explorer_bg.svg';
 import Background_Dark from '@/assets/background-dark.svg';
 

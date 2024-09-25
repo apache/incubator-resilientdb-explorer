@@ -1,5 +1,6 @@
 <script>
-import { useBlocksStore, useThemeStore } from "@/store/blocks";
+import { useBlocksStore} from "@/store/blocks";
+import { useThemeStore } from "@/store/theme";
 import { computed, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';

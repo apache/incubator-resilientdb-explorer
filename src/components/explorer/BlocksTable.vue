@@ -1,5 +1,6 @@
 <script>
-import { useBlocksStore, useThemeStore } from "@/store/blocks";
+import { useBlocksStore} from "@/store/blocks";
+import { useThemeStore } from "@/store/theme";
 import { storeToRefs } from "pinia";
 import { DownOutlined, FireTwoTone, SearchOutlined } from "@ant-design/icons-vue";
 import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";

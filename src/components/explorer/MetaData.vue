@@ -3,7 +3,7 @@
 	import { defineComponent, computed } from "vue";
 	import Chart from "../explorer/Chart.vue";
 	import { useBlocksStore, useLedgerStore } from "@/store/blocks";
-	import { useThemeStore } from "@/store/blocks"; 
+	import { useThemeStore } from "@/store/theme";
 	import { library } from '@fortawesome/fontawesome-svg-core';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 	import { faDatabase, faLink , faLayerGroup, faHourglass} from '@fortawesome/free-solid-svg-icons';
