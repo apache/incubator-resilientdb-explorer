@@ -72,7 +72,7 @@ export default defineComponent({
 
     const columns = [
       {
-        title: " Block # (search)",
+        title: " Block #",
         dataIndex: "number",
         key: "number",
         width: 150,
@@ -83,8 +83,6 @@ export default defineComponent({
         },
         defaultSortOrder: 'descend',
         slots: {
-          filterDropdown: "filterDropdown",
-          filterIcon: "filterIcon",
           customRender: "customRender",
         },
         onFilter: (value, record) =>
