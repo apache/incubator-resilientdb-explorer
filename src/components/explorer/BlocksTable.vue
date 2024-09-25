@@ -1,374 +1,406 @@
 <script>
-	import { useBlocksStore } from "@/store/blocks";
-	import { storeToRefs } from "pinia";
-	import {
-		DownOutlined,
-		FireTwoTone,
-		SearchOutlined,
-	} from "@ant-design/icons-vue";
-	import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";
-	import { library } from '@fortawesome/fontawesome-svg-core';
-	import { faCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
-	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-	library.add(faSearch);
-	library.add(faCircle);
-	export default defineComponent({
-		components: {
-			DownOutlined,
-			FireTwoTone,
-			SearchOutlined,
-			'font-awesome-icon': FontAwesomeIcon,
-		},
-		setup() {
-			const state = reactive({
-				searchText: "",
-				searchedColumn: "",
-			});
-			const handleSearch = (selectedKeys, confirm, dataIndex) => {
-				confirm();
-				state.searchText = selectedKeys[0];
-				state.searchedColumn = dataIndex;
-			};
-			const handleReset = (clearFilters) => {
-				clearFilters();
-				state.searchText = "";
-			};
-			const searchInput = ref();
-			const blocksStore = useBlocksStore();
-			const { blocks } = storeToRefs(blocksStore);
-			// Reactive state for search text
-			const searchText = ref("");
-			
-			// Reactive state for filtered blocks with relativeCreatedAt included
-			const filteredBlocks =  computed(() => blocksStore.filteredBlocks);
-			// Define the onSearch function
-			const onSearch = (value) => {
-				searchText.value = value;
-			};
-			onMounted(async () => {
-				await blocksStore.refreshBlocks();
-				await nextTick(); // Ensures DOM is updated after state changes
-			});
-			const socket = new WebSocket('wss://crow.resilientdb.com/blockupdatelistener'); 
-			socket.addEventListener('open', function (event) { 
-				console.log('Opened websocket for reading blocks'); 
-			}); 
-			socket.addEventListener('message', function (event) { 
-				console.log(event.data);
-				function delay(time) {
-					return new Promise(resolve => setTimeout(resolve, time));
-				}
-				delay(1000).then(() => refreshBlocks());
-			});
-			socket.addEventListener('close', function (event) { 
-				console.log('Websocket for reading blocks has been closed'); 
-			});
-			const columns = [
-				{
-					title: " Block # (search)",
-					dataIndex: "number",
-					key: "number",
-					width: 150,
-					fixed: "left",
-					sorter: {
-						compare: (a, b) => a.id - b.id,
-						multiple: 1,
-					},
-					defaultSortOrder: 'descend',
-					slots: {
-						filterDropdown: "filterDropdown",
-						filterIcon: "filterIcon",
-						customRender: "customRender",
-					},
-					onFilter: (value, record) =>
-						record.number.toString().toLowerCase().includes(value.toLowerCase()),
-					onFilterDropdownVisibleChange: (visible) => {
-						if (visible) {
-							setTimeout(() => {
-								console.log(searchInput.value);
-								searchInput.value.focus();
-							}, 100);
-						}
-					},
-				},
-				{
-					title: "Size",
-					dataIndex: "size",
-					key: "size",
-					width: 150,
-					sorter: {
-						compare: (a, b) => a.size - b.size,
-						multiple: 1,
-					},
-				},
-				{
-					title: "CMD",
-					dataIndex: "cmd",
-					width: 150,
-					key: "cmd",
-				},
-				{
-					title: "created At",
-					dataIndex: "relativeCreatedAt",
-					width: 150,
-					key: "createdAt",
-				},
-			];
-			return {
-				searchText,
-				data: filteredBlocks,
-				columns,
-				handleSearch,
-				searchInput,
-				handleReset,
-            	onSearch,
-				...toRefs(state),
-			};
-		},
-	});
+import { useBlocksStore } from "@/store/blocks";
+import { useThemeStore } from "@/store/blocks"; // Import theme store
+import { storeToRefs } from "pinia";
+import { DownOutlined, FireTwoTone, SearchOutlined } from "@ant-design/icons-vue";
+import { defineComponent, reactive, ref, toRefs, computed, onMounted, nextTick } from "vue";
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+library.add(faSearch);
+library.add(faCircle);
+
+export default defineComponent({
+  components: {
+    DownOutlined,
+    FireTwoTone,
+    SearchOutlined,
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+  setup() {
+    const state = reactive({
+      searchText: "",
+      searchedColumn: "",
+    });
+
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+      confirm();
+      state.searchText = selectedKeys[0];
+      state.searchedColumn = dataIndex;
+    };
+
+    const handleReset = (clearFilters) => {
+      clearFilters();
+      state.searchText = "";
+    };
+
+    const searchInput = ref();
+    const blocksStore = useBlocksStore();
+    const themeStore = useThemeStore(); // Access the theme store
+    const { blocks } = storeToRefs(blocksStore);
+    const theme = computed(() => themeStore.theme.value); // Computed property for theme
+
+    // Reactive state for search text
+    const searchText = ref("");
+
+    // Reactive state for filtered blocks with relativeCreatedAt included
+    const filteredBlocks = computed(() => blocksStore.filteredBlocks);
+
+    // Define the onSearch function
+    const onSearch = (value) => {
+      searchText.value = value;
+    };
+
+    onMounted(async () => {
+      await blocksStore.refreshBlocks();
+      await nextTick(); // Ensures DOM is updated after state changes
+    });
+
+    const socket = new WebSocket('wss://crow.resilientdb.com/blockupdatelistener');
+    socket.addEventListener('open', function (event) {
+      console.log('Opened websocket for reading blocks');
+    });
+    socket.addEventListener('message', function (event) {
+      console.log(event.data);
+      function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+      }
+      delay(1000).then(() => refreshBlocks());
+    });
+    socket.addEventListener('close', function (event) {
+      console.log('Websocket for reading blocks has been closed');
+    });
+
+    const columns = [
+      {
+        title: " Block # (search)",
+        dataIndex: "number",
+        key: "number",
+        width: 150,
+        fixed: "left",
+        sorter: {
+          compare: (a, b) => a.id - b.id,
+          multiple: 1,
+        },
+        defaultSortOrder: 'descend',
+        slots: {
+          filterDropdown: "filterDropdown",
+          filterIcon: "filterIcon",
+          customRender: "customRender",
+        },
+        onFilter: (value, record) =>
+          record.number.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownVisibleChange: (visible) => {
+          if (visible) {
+            setTimeout(() => {
+              console.log(searchInput.value);
+              searchInput.value.focus();
+            }, 100);
+          }
+        },
+      },
+      {
+        title: "Size",
+        dataIndex: "size",
+        key: "size",
+        width: 150,
+        sorter: {
+          compare: (a, b) => a.size - b.size,
+          multiple: 1,
+        },
+      },
+      {
+        title: "CMD",
+        dataIndex: "cmd",
+        width: 150,
+        key: "cmd",
+      },
+      {
+        title: "created At",
+        dataIndex: "relativeCreatedAt",
+        width: 150,
+        key: "createdAt",
+      },
+    ];
+
+    return {
+      searchText,
+      data: filteredBlocks,
+      columns,
+      handleSearch,
+      searchInput,
+      handleReset,
+      onSearch,
+      theme, // Return the theme to use in the template
+      ...toRefs(state),
+    };
+  },
+});
 </script>
 
-
 <template>
-	<div class="white-background-wrapper">
-	  <div class="container timeline">
-		<div class="grid letOverflow">
-		  <a-table class="text-steel-dark" :columns="columns" :data-source="data">
-				<!-- <template #headerCell="{ column }">
-					<template v-if="column.key === 'name'">
-						<span>
-							<smile-outlined />
-							Name
-						</span>
-					</template>
-				</template> -->
-				<template #bodyCell="{ column, record }">
-					<template v-if="column.key === 'size'">
-						<span>
-							{{ record.size }}
-							bytes
-						</span>
-					</template>
-					<template v-if="column.key === 'cmd'">
-						<span class="cmd">{{ record.transactions[0]?.cmd }}</span>
-					</template>
-					<template v-if="column.key === 'createdAt'">
-						<span>{{ record.relativeCreatedAt }}</span>
-					</template>
-					<template v-else-if="column.key === 'gasUsed'">
-						<div>
-							<fire-two-tone two-tone-color="red" /> {{ record.gasUsed }}
-						</div>
-					</template>
-				</template>
-				<!--Search functionality within a block for Block #-->
-				
-				<template #filterIcon="filtered">
-				</template>
-
-				
-				<template #customRender="{ text, record, column }">
-					<span v-if="searchText && searchedColumn === column.dataIndex">
-						<template
-							v-for="(fragment, i) in text
-								.toString()
-								.split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-						>
-							<mark
-								v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-								class="highlight"
-								:key="i"
-							>
-								<a :href="'/block?id=' + record.id">{{ fragment }}</a>
-							</mark>
-							<template v-else>
-								<a :href="'/block?id=' + record.id">{{ fragment }}</a></template
-							>
-						</template>
-					</span>
-					
-					<template v-else>
-						<a class="block-num" :href="'/block?id=' + record.id">
-							<span>
-								<font-awesome-icon class="fa-circle" icon="circle" />
-								{{ record.number }}
-							</span>
-						</a>
-					</template>
-				</template>
-			</a-table>
-				
-		</div>
-		</div>
-		</div>
+  <div :class="['white-background-wrapper', theme]">
+    <div class="container timeline" :class="[theme]">
+      <div class="grid letOverflow" :class="[theme]">
+        <a-table class="text-steel-dark" :columns="columns" :data-source="data" :class="[theme]">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'size'">
+              <span>{{ record.size }} bytes</span>
+            </template>
+            <template v-if="column.key === 'cmd'">
+              <span class="cmd">{{ record.transactions[0]?.cmd }}</span>
+            </template>
+            <template v-if="column.key === 'createdAt'">
+              <span>{{ record.relativeCreatedAt }}</span>
+            </template>
+            <template v-else-if="column.key === 'gasUsed'">
+              <div>
+                <fire-two-tone two-tone-color="red" /> {{ record.gasUsed }}
+              </div>
+            </template>
+          </template>
+          <template #customRender="{ text, record, column }">
+            <span v-if="searchText && searchedColumn === column.dataIndex">
+              <template v-for="(fragment, i) in text.toString().split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))">
+                <mark v-if="fragment.toLowerCase() === searchText.toLowerCase()" class="highlight" :key="i">
+                  <a :href="'/block?id=' + record.id">{{ fragment }}</a>
+                </mark>
+                <template v-else>
+                  <a :href="'/block?id=' + record.id">{{ fragment }}</a>
+                </template>
+              </template>
+            </span>
+            <template v-else>
+              <a class="block-num" :href="'/block?id=' + record.id">
+                <span>
+                  <font-awesome-icon class="fa-circle" icon="circle" />
+                  {{ record.number }}
+                </span>
+              </a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+  </div>
 </template>
-  
+
 <style scoped>
-	.white-background-wrapper {
-		background-color: #FFFFFF; /* Set background color to white */
-		width: 100%; /* Cover the full width */
-		display: flex; /* Use flex layout */
-		flex-direction: column; /* Stack children vertically */
-		align-items: center; /* Center children horizontally */
-		justify-content: flex-start; /* Align content to the start */
-	}
+/* Light Theme Styles */
+.light .white-background-wrapper {
+	background-color: #FFFFFF; /* Light mode background */
+}
 
-	.latestBlocks{
-		font-size: 18px;
-    	line-height: 1.13;
-		font-weight: 600;
-		color: rgb(17,17,17,0.65);
-		margin-left: -1rem;
-		display: inline-block; /* This is needed to position the pseudo-elements */
-		position: relative;
-	}
+.light .container {
+	background-color: #ffffff; /* Light container background */
+	color: #333; /* Dark text for readability */
+}
 
-	.container {
-		width: 100%;
-		align-self: center;
-		margin: auto;
-	}
-	.heading {
-		display: flex;
-		width: 100%;
-		margin: 0 2rem;
-	}
-	.grid {
-		margin: 0 1rem;
-		padding: 0 1rem;
-	}
+.light .grid {
+	background-color: #FFFFFF; /* Light grid background */
+}
 
-	.letOverflow {
-		overflow: scroll;
-		flex-wrap: nowrap !important;
-		overflow-x: scroll;
-		overflow-y: none;
-	}
+.light .ant-table {
+	background-color: #ffffff;
+	color: #333;
+}
 
-	::-webkit-scrollbar {
-		display: none;
-	}
+.light .block-num {
+	color: #4299E1; /* Text color specific to light mode */
+}
 
-	#dash {
-		margin-bottom: 1%;
-	}
+.light .cmd {
+	background-color: #ffffff;
+	color: #000000;
+}
 
-	.timeline:before {
-		visibility: hidden !important;
-	}
-	.highlight {
-		background-color: rgb(255, 192, 105);
-		padding: 0px;
-	}
+/* Dark Theme Styles */
+.dark .white-background-wrapper {
+	background-color: #022045; /* Dark mode background */
+	color: #ffffff; /* Light text in dark mode */
+}
 
-	.block-num{
-		color: #4299E1;
-		font-weight: 600;
-		font-size: 14px;
-    	line-height: 1.13;
-		font-family: Red Hat Mono Variable, Red Hat Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-	}
+.dark .container {
+	background-color: #022045;
+	color: #ffffff;
+}
 
-	.cmd{
-		outline: none;
-		outline-offset: 2px;
-		border-width: 1px;
-		background: none;
-		border:none;
-		font-family: Red Hat Mono Variable,Red Hat Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
-		font-size: 12px;
-		box-shadow: none;
-	}
+.dark .grid {
+	background-color: #022045;
+	color: #ffffff;
+}
 
-	.fa-circle{
-		color: #90CDF4;
-		font-size: 8px;
-	}
+.dark .ant-table {
+	background-color: #022045 !important; /* Dark mode table background */
+	color: #ffffff !important; /* Light text for table rows */
+}
 
-	::v-deep .ant-table {
-		border-collapse: separate;
-		border-spacing: 0;
-	}
-	::v-deep .ant-table-tbody > tr > td {
-		border: none; /* Remove all borders from cells */
-		height: 10px;
-	}
-	::v-deep .ant-table-thead > tr > th {
-		border-top: 1px solid black;
-		background-color: #f0f0f0; /* Example: Light grey background */
-		color: #333; /* Dark text color */
-		font-weight: bold;
-		height: 1.875rem;
-		text-align: left;
-		font-size: 12px;
-		line-height: 1.13;
-		font-weight: 600;
-		text-transform: uppercase;
-		color: #2C5282;
-	}
+.dark ::v-deep .ant-table-thead > tr > th {
+	background-color: #022045 !important;
+	color: #ffffff !important; /* Header text color */
+	border-bottom: 1px solid #ffffff; /* Adjust borders */
+}
 
-	::v-deep .ant-table-tbody > tr > td {
-    background: #FFFFFF; /* White background for table cells */
-	}
+.dark ::v-deep .ant-table-tbody > tr > td {
+	background-color: #022045 !important; /* Dark mode table cells */
+	color: #ffffff !important; /* Text color for contrast */
+}
 
-	/* Set the background color for the entire row on hover */
-	::v-deep .ant-table-tbody > tr:hover > td {
-		background: #F3F6F8; /* Light grey background for table rows on hover */
-	}
+.dark ::v-deep .ant-table-tbody > tr:hover > td {
+	background-color: #003366 !important; /* Slightly darker hover effect */
+}
 
-	/* Set the background color for a specific table cell on hover */
-	::v-deep .ant-table-tbody > tr > td:hover {
-		background: #E1F3FF; /* Light blue background for table cells on hover */
-	}
+.dark .block-num {
+	color: #ffffff !important; /* Adjust text color for dark mode */
+}
 
-	/* Ensure the hover background color change is visible only within the cell, 
-	not affecting the entire row. This might require specific handling based on 
-	the structure of your table and cells. The following is an additional rule 
-	to ensure row hover doesn't override cell hover. */
-	::v-deep .ant-table-tbody > tr:hover > td:hover {
-		background: #E1F3FF; /* This ensures the cell hover color is correct */
-	}
+.dark .cmd {
+	background-color: #1a1a1a !important; /* Darker background for commands */
+	color: #ffffff !important;
+}
 
-	/* Set the background color for table headings to white */
-	::v-deep .ant-table-thead > tr > th {
-		background: #FFFFFF; /* White background for table headings */
-		border: none !important; /* Remove borders */
-		outline: none !important; /* Remove outlines */
-	}
+/* General Styles */
+.container {
+	width: 100%;
+	align-self: center;
+	margin: auto;
+}
 
-	/* Changes the background color of the pagination buttons */
-	::v-deep .ant-pagination-item {
+.grid {
+	margin: 0 1rem;
+	padding: 0 1rem;
+}
+
+.letOverflow {
+	overflow: scroll;
+	flex-wrap: nowrap !important;
+	overflow-x: scroll;
+	overflow-y: none;
+}
+
+::-webkit-scrollbar {
+	display: none;
+}
+
+.latestBlocks {
+	font-size: 18px;
+	line-height: 1.13;
+	font-weight: 600;
+	color: rgb(17, 17, 17, 0.65);
+	margin-left: -1rem;
+	display: inline-block;
+	position: relative;
+}
+
+.heading {
+	display: flex;
+	width: 100%;
+	margin: 0 2rem;
+}
+
+#dash {
+	margin-bottom: 1%;
+}
+
+.timeline:before {
+	visibility: hidden !important;
+}
+
+.highlight {
+	background-color: rgb(255, 192, 105);
+	padding: 0px;
+}
+
+.block-num {
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 1.13;
+	font-family: Red Hat Mono Variable, Red Hat Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+}
+
+.cmd {
+	outline: none;
+	outline-offset: 2px;
+	border-width: 1px;
+	background: none;
+	border: none;
+	font-family: Red Hat Mono Variable, Red Hat Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+	font-size: 12px;
+	box-shadow: none;
+}
+
+.fa-circle {
+	color: #90CDF4;
+	font-size: 8px;
+}
+
+/* Additional deep styles for table */
+::v-deep .ant-table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+::v-deep .ant-table-tbody > tr > td {
+	border: none;
+	height: 10px;
+}
+
+::v-deep .ant-table-thead > tr > th {
+	border-top: 1px solid black;
+	background-color: #ffffff; /* Light grey background for light mode */
+	color: #2C5282;
+	font-weight: bold;
+	font-size: 12px;
+	line-height: 1.13;
+}
+
+::v-deep .ant-table-tbody > tr > td:hover {
+	background: #E1F3FF;
+}
+
+::v-deep .ant-table-tbody > tr:hover > td:hover {
+	background: #E1F3FF;
+}
+
+::v-deep .ant-table-thead > tr > th {
+	background: #FFFFFF;
+	border: none !important;
+	outline: none !important;
+}
+
+::v-deep .ant-pagination-item {
 	background-color: #FFFFFF;
-	}
+}
 
-	::v-deep .ant-pagination-item-active{
-		border-color: #4299E1;
-	}
+::v-deep .ant-pagination-item-active {
+	border-color: #4299E1;
+}
 
-	::v-deep .ant-pagination-item-active a  {
-		
-		color: #2C5282;
-		outline: #2C5282;
-		
-	}
+::v-deep .ant-pagination-item-active a {
+	color: #2C5282;
+	outline: #2C5282;
+}
 
-	::v-deep .ant-pagination-item a  {
-		color: #1890ff;
-		border-color: #1890ff;
-	}
+::v-deep .ant-pagination-item a {
+	color: #1890ff;
+	border-color: #1890ff;
+}
 
-	::v-deep .ant-pagination-item:hover  {
-		color: #1890ff;
-		border-color: #1890ff;
-	}
+::v-deep .ant-pagination-item:hover {
+	color: #1890ff;
+	border-color: #1890ff;
+}
 
-	::v-deep .ant-pagination-item a:hover  {
-		color: #1890ff;
-	}
-	/* Style changes for the previous and next buttons */
-	::v-deep .ant-pagination-prev .ant-pagination-item-link, .ant-pagination-next .ant-pagination-item-link {
-		color: #1890ff;
+::v-deep .ant-pagination-item a:hover {
+	color: #1890ff;
+}
+
+::v-deep .ant-pagination-prev .ant-pagination-item-link,
+::v-deep .ant-pagination-next .ant-pagination-item-link {
+	color: #1890ff;
 	border-color: #91d5ff;
-	}
-
+}
 </style>
+
+
+  
