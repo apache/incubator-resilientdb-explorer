@@ -1,26 +1,23 @@
 <script>
 import { useBlocksStore, useThemeStore } from "@/store/blocks";
 import { computed, ref } from 'vue';
-import HorizontalMenuBar from "@/views/menu/HorizontalMenuBar.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
-// Import your logo images
 import logoLight from '@/assets/logo.png';
 import logoDark from '@/assets/logo.png';
 
-library.add(faSun, faMoon); // Add the sun and moon icons to the library
+library.add(faSun, faMoon);
 
 export default {
   name: "HeaderView",
-  components: { HorizontalMenuBar, FontAwesomeIcon },
+  components: { FontAwesomeIcon },
   setup() {
-    const searchQuery = ref(''); // Initialize the search query state
-    const blocksStore = useBlocksStore(); // Access the blocks store
+    const searchQuery = ref('');
+    const blocksStore = useBlocksStore();
     const themeStore = useThemeStore();
 
-    // Function to update the search text in the blocks store
     const updateSearch = (query) => {
       blocksStore.setSearchText(query);
     };
@@ -29,18 +26,12 @@ export default {
       themeStore.toggleTheme();
     };
 
-    // Computed property to determine which icon to use
     const themeIcon = computed(() => themeStore.theme.value === 'light' ? 'sun' : 'moon');
-
-    // Computed property to get the current theme
     const theme = computed(() => themeStore.theme.value);
-
-    // Computed property for the logo source based on the theme
     const logoSrc = computed(() => (theme.value === 'dark' ? logoDark : logoLight));
 
-    // Return everything that will be used in the template
-    return { 
-      searchQuery, 
+    return {
+      searchQuery,
       updateSearch,
       toggleTheme,
       themeIcon,
@@ -52,13 +43,19 @@ export default {
 </script>
 
 
+
 <template>
   <div :class="['header', theme]">
     <div class="logo-and-search">
-      <img :src="logoSrc" class="logo" alt="ResilientDB"/>
+      <img :src="logoSrc" class="logo" alt="ResilientDB" />
       <div class="search">
         <font-awesome-icon class="fa-icon" icon="search" />
-        <input v-model="searchQuery" @input="updateSearch($event.target.value)" placeholder="Search" class="custom-search"/>
+        <input
+          v-model="searchQuery"
+          @input="updateSearch($event.target.value)"
+          placeholder="Search"
+          class="custom-search"
+        />
       </div>
       <button class="theme-toggle" @click="toggleTheme">
         <font-awesome-icon :icon="themeIcon" />
@@ -67,8 +64,8 @@ export default {
   </div>
 </template>
 
-  
 
+  
 <style scoped lang="scss">
 @import "@/styles/variables.scss";
 
@@ -80,40 +77,37 @@ export default {
   padding: 10px;
 }
 
-/* Existing light theme styles remain unchanged */
-
 /* Dark Theme Styles */
 .header.dark {
   background: #06295d; /* Dark blue background */
 }
 
 .header.dark .search {
-  background-color: #1F3B73; /* Slightly darker than #244a8c */
+  background-color: #1F3B73;
 }
 
 .header.dark .search:hover {
-  background: #244a8c; /* Lighter shade for hover effect */
+  background: #244a8c;
 }
 
 .header.dark .fa-icon,
 .header.dark .theme-toggle {
-  color: #90cdf4; /* Lighter blue for icons */
+  color: #90cdf4;
 }
 
 .header.dark .custom-search {
-  color: #e0e0e0; /* Light grey text */
+  color: #e0e0e0;
 }
 
 .header.dark .custom-search::placeholder {
   color: #e0e0e0;
 }
 
-/* Rest of your existing styles */
 .logo-and-search {
   display: flex;
   align-items: center;
   flex-grow: 1;
-  gap: 10px; /* Adjust the gap between logo and search */
+  gap: 10px;
 }
 
 .logo {
@@ -125,19 +119,18 @@ export default {
   display: flex;
   align-items: center;
   flex-grow: 1;
-  background-color: #15527b0d; /* Existing light theme color */
+  background-color: #15527b0d;
   border-radius: 0.25rem;
-  padding-left: 10px; /* Padding for icon */
+  padding-left: 10px;
 }
 
 .fa-icon {
-  /* Adjust the spacing to the right of the icon */
-  color: #3A6F91; /* Existing light theme color */
+  color: #3A6F91;
   padding-top: 0.86rem;
   padding-bottom: 0.88rem;
   padding-left: 5px;
   padding-right: 5px;
-  flex-shrink: 0; /* Prevents the icon from shrinking */
+  flex-shrink: 0;
   font-size: 18px;
 }
 
@@ -148,29 +141,28 @@ export default {
   background: none;
   box-shadow: none;
   border-radius: 0.25rem;
-  /* Typing text styles */
   font-size: 16px;
   font-family: 'Red Hat Mono Variable', 'Red Hat Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  color: #84A9C0; /* Existing light theme color */
+  color: #84A9C0;
 }
 
 .custom-search::placeholder {
-  font-size: 16px; /* Adjust to your preference */
+  font-size: 16px;
   vertical-align: middle;
   font-family: 'Red Hat Mono Variable', 'Red Hat Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  color: #84A9C0; /* Existing light theme color */
+  color: #84A9C0;
 }
 
 .search:hover {
-  background: #CFE2EF; /* Existing light theme color */
+  background: #CFE2EF;
 }
 
 .theme-toggle {
-  color: #84A9C0; /* Existing light theme color */
+  color: #84A9C0;
   background: none;
   flex-shrink: 0;
-  font-size: 24px; /* Consistent font size */
-  padding: 8px; /* Consistent padding */
+  font-size: 24px;
+  padding: 8px;
   border: none;
   display: inline-flex;
   align-items: center;
@@ -178,28 +170,50 @@ export default {
   cursor: pointer;
   transition: transform 0.2s ease;
 
-  /* Ensure the icon maintains a consistent size */
   & > svg {
     width: 1.5em;
-    height: 1.5em; /* Ensures both icons are the same size */
+    height: 1.5em;
   }
 }
 
 /* Responsive Styles */
 @media (max-width: 725px) {
-  .header, .logo-and-search {
-    flex-direction: column;
+  .header {
+    flex-direction: row; /* Maintain row direction on mobile */
+    flex-wrap: wrap; /* Allow items to wrap within the row */
+    gap: 10px;
+  }
+
+  .logo-and-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo {
+    flex-shrink: 0;
+    height: 40px;
+  }
+
+  .search {
+    flex: 1;
+    display: flex;
     align-items: center;
   }
+
   .custom-search {
-    width: calc(100% - 20px); /* Adjust based on parent padding */
-  }
-  .theme-toggle {
-    order: 3;
     width: 100%;
-    margin-top: 10px;
+    padding: 5px;
+  }
+
+  .theme-toggle {
+    flex-shrink: 0;
+    padding: 5px;
+    margin-left: auto;
   }
 }
 </style>
+
 
 
