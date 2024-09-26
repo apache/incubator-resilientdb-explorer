@@ -48,7 +48,10 @@ export default {
 <template>
   <div :class="['header', theme]">
     <div class="logo-and-search">
-      <img :src="logoSrc" class="logo" alt="ResilientDB" />
+      <!-- Wrap the logo with an anchor tag to make it a hyperlink -->
+      <a href="https://resilientdb.incubator.apache.org/" target="_blank" rel="noopener noreferrer">
+        <img :src="logoSrc" class="logo" alt="ResilientDB" />
+      </a>
       <div class="search">
         <font-awesome-icon class="fa-icon" icon="search" />
         <input
@@ -64,6 +67,7 @@ export default {
     </div>
   </div>
 </template>
+
 
 
   
