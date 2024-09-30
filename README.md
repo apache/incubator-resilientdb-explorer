@@ -1,4 +1,7 @@
 # ResilientDB Explorer
+
+Explorer is a tool for visualizing the ResilientDB blockchain. This displays specific blocks on the blockchain, transactions within the blocks, ledger configuration data, and a chart exposing transaction history, in real-time using Web-sockets.
+
 Commits to main branch trigger CI/CD.
 
 ## Customize configuration
