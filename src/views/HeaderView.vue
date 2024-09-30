@@ -49,7 +49,7 @@ export default {
   <div :class="['header', theme]">
     <div class="logo-and-search">
       <!-- Wrap the logo with an anchor tag to make it a hyperlink -->
-      <a href="https://resilientdb.incubator.apache.org/" target="_blank" rel="noopener noreferrer">
+      <a href="https://explorer.resilientdb.com/" target="_blank" rel="noopener noreferrer">
         <img :src="logoSrc" class="logo" alt="ResilientDB" />
       </a>
       <div class="search">
