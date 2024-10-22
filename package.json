@@ -15,7 +15,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.6",
     "ant-design-vue": "^3.2.3",
     "apexcharts": "^3.35.2",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "html-loader": "^4.2.0",
     "pinia": "^2.0.13",
     "vue": "^3.4.19",
